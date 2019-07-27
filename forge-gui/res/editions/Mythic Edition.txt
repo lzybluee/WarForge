@@ -1,0 +1,41 @@
+[metadata]
+Code=MYED
+Date=2018-10-03
+Name=Mythic Edition
+MciCode=myed
+Type=Other
+
+[cards]
+1 M Elspeth, Knight-Errant
+2 M Liliana, the Last Hope
+3 M Daretti, Ingenious Iconoclast
+4 M Nicol Bolas, Planeswalker
+5 M Ral, Izzet Viceroy
+6 M Teferi, Hero of Dominaria
+7 M Tezzeret, Agent of Bolas
+8 M Vraska, Golgari Queen
+9 M Karn, Scion of Urza
+10 M Tamiyo, the Moon Sage
+11 M Sorin Markov
+12 M Jaya Ballard
+13 M Ajani, Mentor of Heroes
+14 M Dack Fayden
+15 M Domri, Chaos Bringer
+16 M Kaya, Orzhov Usurper
+17 M Ugin, the Spirit Dragon
+18 M Gideon Blackblade
+19 M Jace, the Mind Sculptor
+20 M Tezzeret the Seeker
+21 M Garruk, Apex Predator
+22 M Nicol Bolas, Dragon-God
+23 M Nahiri, the Harbinger
+24 M Sarkhan Unbroken
+
+[tokens]
+w_1_1_soldier
+b_2_2_zombie
+c_1_1_a_construct_defender
+c_0_0_a_construct_total_artifacts
+rg_4_4_beast_trample
+b_3_3_beast_deathtouch
+r_4_4_dragon_flying

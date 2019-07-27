@@ -103,15 +103,15 @@ public class EffectEffect extends SpellAbilityEffect {
         final Player controller = sa.hasParam("EffectOwner") ? ownerEff : sa.getActivatingPlayer();
         
         String image;
-        if (sa.hasParam("Image")) {
-            image = ImageKeys.getTokenKey(sa.getParam("Image"));
-        } else if (name.startsWith("Emblem")) { // try to get the image from name
+        if (name.startsWith("Emblem") || (sa.hasParam("Image") && sa.getParam("Image").startsWith("emblem_"))) { // try to get the image from name
             image = ImageKeys.getTokenKey(
-            TextUtil.fastReplace(
+            "emblem_" + TextUtil.fastReplace(
                 TextUtil.fastReplace(
-                    TextUtil.fastReplace(name.toLowerCase(), " - ", "_"),
+                    TextUtil.fastReplace(hostCard.getName().toLowerCase(), " - ", "_"),
                         ",", ""),
-                    " ", "_").toLowerCase());
+                    " ", "_").toLowerCase() + "_" + sa.getHostCard().getPaperCard().getEdition());
+        } else if (sa.hasParam("Image")) {
+            image = ImageKeys.getTokenKey(sa.getParam("Image"));
         } else { // use host image
             image = hostCard.getImageKey();
         }
