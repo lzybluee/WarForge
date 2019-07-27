@@ -77,12 +77,14 @@ S Bituminous Blast
 S Black Lotus
 S Black Lotus
 S Black Sun's Zenith
+S Blackblade Reforged
 S Blight Herder
 S Blighted Fen
 S Blightning
 S Blood Knight
 S Bloodcrazed Neonate
 S Bloodlord of Vaasgoth
+S Blue Elemental Blast
 S Boggart Ram-Gang
 S Bolas's Citadel
 S Boltwing Marauder
@@ -90,6 +92,7 @@ S Bonescythe Sliver
 S Boneyard Wurm
 S Boros Challenger
 S Brain Maggot
+S Brainstorm
 S Bramblewood Paragon
 S Brass's Bounty
 S Brave the Elements
@@ -308,6 +311,7 @@ S Gideon Blackblade
 S Gideon of the Trials
 S Gideon of the Trials
 S Gideon, Ally of Zendikar
+S Gifts Ungiven
 S Gitaxian Probe
 S Gladehart Cavalry
 S Glissa, the Traitor
@@ -465,6 +469,7 @@ S Mana Tithe
 S Mardu Shadowspear
 S Marisi's Twinclaws
 S Markov Dreadknight
+S Martyr's Bond
 S Master's Call
 S Mastery of the Unseen
 S Maul Splicer
@@ -527,6 +532,7 @@ S Mwonvuli Beast Tracker
 S Mycoid Shepherd
 S Myr Superion
 S Mystic of the Hidden Way
+S Mystical Tutor
 S Nahiri, Storm of Stone
 S Nameless Inversion
 S Narset, Parter of Veils
@@ -534,6 +540,7 @@ S Naya Sojourners
 S Nearheath Stalker
 S Necromaster Dragon
 S Necropolis Fiend
+S Negate
 S Negate
 S Nephalia Moondrakes
 S Nessian Wilds Ravager
@@ -569,6 +576,7 @@ S Oros, the Avenger
 S Overbeing of Myth
 S Oxidize
 S Pain Seer
+S Path to Exile
 S Path to Exile
 S Path to Exile
 S Pathrazer of Ulamog
@@ -647,6 +655,7 @@ S Remove Soul
 S Render Silent
 S Renegade Rallier
 S Resolute Archangel
+S Rest in Peace
 S Resurrection
 S Reverse Engineer
 S Rhox War Monk
@@ -690,6 +699,7 @@ S Shamanic Revelation
 S Shard Phoenix
 S Sheoldred, Whispering One
 S Shield of Kaldra
+S Shielded by Faith
 S Shipbreaker Kraken
 S Shrine of Burning Rage
 S Siege Dragon
@@ -787,6 +797,7 @@ S Thaumatic Compass
 S The Wanderer
 S Thirst for Knowledge
 S Thopter Assembly
+S Threads of Disloyalty
 S Thunderbreak Regent
 S Tibalt, Rakish Instigator
 S Tidehollow Sculler
@@ -804,6 +815,7 @@ S Treva, the Renewer
 S Tromokratis
 S Trophy Mage
 S Trostani's Summoner
+S True Conviction
 S Trueheart Duelist
 S Tundra
 S Turnabout
@@ -851,6 +863,7 @@ S Wildcall
 S Wildfire Eternal
 S Wilt-Leaf Cavaliers
 S Woolly Thoctar
+S Worship
 S Wrath of God
 S Wren's Run Packmaster
 S Wren's Run Vanquisher
