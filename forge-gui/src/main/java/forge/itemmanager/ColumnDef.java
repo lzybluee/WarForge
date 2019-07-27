@@ -389,6 +389,9 @@ public enum ColumnDef {
             new Function<Entry<? extends InventoryItem, Integer>, Object>() {
                 @Override
                 public Object apply(final Entry<? extends InventoryItem, Integer> from) {
+                	if(toDeck(from.getKey()).getEdition() == null) {
+                		return "";
+                	}
                     return toDeck(from.getKey()).getEdition().getCode();
                 }
             }),
