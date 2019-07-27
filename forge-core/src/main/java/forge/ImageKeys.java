@@ -66,6 +66,30 @@ public final class ImageKeys {
         return tokenKey.substring(ImageKeys.TOKEN_PREFIX.length());
     }
 
+    private static File findTokenImageFile(String dir, String setlessFilename, String setCode) {
+    	// try with upper case set
+        File file = findFile(dir, setlessFilename + "_" + setCode.toUpperCase());
+        if (file != null) { return file; }
+        // try with lower case set
+        file = findFile(dir, setlessFilename + "_" + setCode.toLowerCase());
+        if (file != null) { return file; }
+        // try without set name
+        file = findFile(dir, setlessFilename);
+        if (file != null) { return file; }
+        // if there's an art variant try without it
+        if (setlessFilename.matches(".*[0-9]*$")) {
+            file = findFile(dir, setlessFilename.replaceAll("[0-9]*$", ""));
+            if (file != null) { return file; }
+        }
+        String[] split = setlessFilename.split("_");
+        for(int i = 0; i <= split.length - 5; i++) {
+        	setlessFilename = setlessFilename.substring(0, setlessFilename.lastIndexOf("_"));
+        	file = findFile(dir, setlessFilename);
+            if (file != null) { return file; }
+        }
+        return null;
+    }
+
     public static File getImageFile(String key) {
         if (StringUtils.isEmpty(key)) {
             return null;
@@ -124,21 +148,9 @@ public final class ImageKeys {
             if (index != -1) {
                 String setlessFilename = filename.substring(0, index);
                 String setCode = filename.substring(index + 1, filename.length());
-                // try with upper case set
-                file = findFile(dir, setlessFilename + "_" + setCode.toUpperCase());
+                file = findTokenImageFile(dir, setlessFilename, setCode);
                 if (file != null) { return file; }
-                // try with lower case set
-                file = findFile(dir, setlessFilename + "_" + setCode.toLowerCase());
-                if (file != null) { return file; }
-                // try without set name
-                file = findFile(dir, setlessFilename);
-                if (file != null) { return file; }
-                // if there's an art variant try without it
-                if (setlessFilename.matches(".*[0-9]*$")) {
-                    file = findFile(dir, setlessFilename.replaceAll("[0-9]*$", ""));
-                    if (file != null) { return file; }
-                }
-                file = findFile(dir, setlessFilename.replace("_a_", "_"));
+                file = findTokenImageFile(dir, setlessFilename.replace("_a_", "_"), setCode);
                 if (file != null) { return file; }
             }
         } else if (filename.contains("/")) {
@@ -153,7 +165,7 @@ public final class ImageKeys {
             }
         }
 
-        // System.out.println("File not found, no image created: " + key);
+        System.out.println("File not found, no image created: " + key);
 
         return null;
     }
