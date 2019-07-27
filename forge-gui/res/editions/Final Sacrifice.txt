@@ -1,8 +1,0 @@
-[metadata]
-Code=FS
-Date=1995-03-23
-Name=Final Sacrifice
-Type=Other
-
-[cards]
-C Mana Crypt

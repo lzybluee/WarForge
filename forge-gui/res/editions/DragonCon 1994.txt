@@ -1,9 +1,0 @@
-[metadata]
-Code=DRC94
-Date=1994-07-15
-Name=DragonCon 1994
-Border=Black
-Type=Other
-
-[cards]
-S Nalathni Dragon

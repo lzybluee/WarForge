@@ -121,11 +121,16 @@ public class StaticData {
     public PaperCard getOrLoadCommonCard(String cardName, String setCode, int artIndex, boolean foil) {
         PaperCard card = commonCards.getCard(cardName, setCode, artIndex);
         if (card == null) {
-            attemptToLoadCard(cardName, setCode);
             card = commonCards.getCard(cardName, setCode, artIndex);
         }
         if (card == null) {
             card = commonCards.getCard(cardName, setCode, -1);
+        }
+        if (card == null) {
+            card = commonCards.getCard(cardName, null, -1);
+        }
+        if (card == null) {
+            card = variantCards.getCard(cardName, null, -1);
         }
         if (card == null) {
             return null;

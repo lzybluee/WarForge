@@ -80,9 +80,16 @@ public class CardPool extends ItemPool<PaperCard> {
         if (!isCommonCard) {
             paperCard = StaticData.instance().getVariantCards().getCard(cardName, setCode);
             if (paperCard == null) {
-                StaticData.instance().attemptToLoadCard(cardName, setCode);
                 paperCard = StaticData.instance().getVariantCards().getCard(cardName, setCode);
             }
+        }
+
+        if(paperCard == null) {
+        	paperCard = StaticData.instance().getCommonCards().getCard(cardName, null, -1);
+        }
+
+        if(paperCard == null) {
+        	paperCard = StaticData.instance().getVariantCards().getCard(cardName, null, -1);
         }
 
         int artCount = 1;
