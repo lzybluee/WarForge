@@ -47,6 +47,7 @@ S Arashin Sovereign
 S Arashin War Beast
 S Arbiter of the Ideal
 S Arc Lightning
+S Arcbound Ravager
 S Archfiend of Depravity
 S Archfiend of Ifnir
 S Archon of the Triumvirate
@@ -285,6 +286,7 @@ S Forest
 S Forest
 S Forest
 S Forest
+S Forest
 S Forgestoker Dragon
 S Formless Nurturing
 S Fortune's Favor
@@ -372,6 +374,7 @@ S Inferno Titan
 S Infest
 S Ink-Eyes, Servant of Oni
 S Inkmoth Nexus
+S Island
 S Island
 S Island
 S Island
@@ -518,6 +521,7 @@ S Mountain
 S Mountain
 S Mountain
 S Mountain
+S Mountain
 S Mox Emerald
 S Mox Jet
 S Mox Pearl
@@ -589,6 +593,7 @@ S Pia and Kiran Nalaar
 S Pillar of Flame
 S Plague Myr
 S Plague Stinger
+S Plains
 S Plains
 S Plains
 S Plains
@@ -716,6 +721,7 @@ S Skarrg Goliath
 S Skinrender
 S Skyship Stalker
 S Slave of Bolas
+S Sliver Legion
 S Smash to Smithereens
 S Smite the Monstrous
 S Snapcaster Mage
@@ -749,6 +755,7 @@ S Supplant Form
 S Supreme Verdict
 S Surgical Extraction
 S Suspension Field
+S Swamp
 S Swamp
 S Swamp
 S Swamp
