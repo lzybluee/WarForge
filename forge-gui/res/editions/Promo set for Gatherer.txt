@@ -326,6 +326,10 @@ S Goblin Diplomats
 S Goblin Guide
 S Goblin Rabblemaster
 S Goblin Warchief
+S God-Eternal Bontu
+S God-Eternal Kefnet
+S God-Eternal Oketra
+S God-Eternal Rhonas
 S Golem's Heart
 S Grave Titan
 S Gravecrawler
@@ -549,6 +553,7 @@ S Negate
 S Nephalia Moondrakes
 S Nessian Wilds Ravager
 S Niblis of Frost
+S Nicol Bolas, Dragon-God
 S Nicol Bolas, Dragon-God
 S Nicol Bolas, God-Pharaoh
 S Nighthowler
