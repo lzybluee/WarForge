@@ -237,3 +237,4 @@ forge-gui/tools/oracleScript.log
 .vscode/settings.json
 .vscode/launch.json
 /forge
+/forge-gui-desktop/userDir

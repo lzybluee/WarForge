@@ -2,6 +2,7 @@ package forge.match.input;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -198,7 +199,7 @@ public abstract class InputPayMana extends InputSyncronizedBase {
             return false;
         }
 
-        HashMap<SpellAbilityView, SpellAbility> abilitiesMap = new HashMap<>();
+        HashMap<SpellAbilityView, SpellAbility> abilitiesMap = new LinkedHashMap<>();
         // you can't remove unneeded abilities inside a for (am:abilities) loop :(
 
         final String typeRes = manaCost.getSourceRestriction();
