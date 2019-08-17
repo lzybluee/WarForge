@@ -210,7 +210,7 @@ public class DeckRecognizer {
         if (line.toLowerCase().contains("commander")) {
             return true;
         }
-        if (line.toLowerCase().contains("planes")) {
+        if (line.toLowerCase().contains("planes") && !line.toLowerCase().contains("planeswalker")) {
             return true;
         }
         if (line.toLowerCase().contains("schemes")) {
