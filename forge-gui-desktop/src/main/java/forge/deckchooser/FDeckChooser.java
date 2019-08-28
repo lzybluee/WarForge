@@ -220,7 +220,7 @@ public class FDeckChooser extends JPanel implements IDecksComboBoxListener {
         }
 
         lstDecks.setAllowMultipleSelections(false);
-        lstDecks.setPool(CommanderDeckGenerator.getCommanderDecks(deckFormat, isAi, true));
+        lstDecks.setPool(CommanderDeckGenerator.getCommanderDecks(deckFormat, isAi, deckFormat.equals(DeckFormat.Oathbreaker) ? false : true));
         lstDecks.setup(ItemManagerConfig.STRING_ONLY);
 
         btnRandom.setText("Random");

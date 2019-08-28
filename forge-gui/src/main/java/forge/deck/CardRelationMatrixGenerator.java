@@ -34,7 +34,7 @@ public final class CardRelationMatrixGenerator {
     public static final int MIN_REQUIRED_CONNECTIONS = 14;
 
     public static boolean initialize(){
-        return initializeFormat(DeckFormat.Commander) && initializeFormat(DeckFormat.Oathbreaker);
+        return initializeFormat(DeckFormat.Commander);
     }
 
     /** Try to load matrix .dat files, otherwise check for deck folders and build .dat, otherwise return false **/
