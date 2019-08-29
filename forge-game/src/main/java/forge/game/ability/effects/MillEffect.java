@@ -48,9 +48,7 @@ public class MillEffect extends SpellAbilityEffect {
                 // Reveal the milled cards, so players don't have to manually inspect the
                 // graveyard to figure out which ones were milled.
                 if (!facedown && reveal) { // do not reveal when exiling face down
-                    if (showRevealDialog) {
-                        game.getAction().reveal(milled, p, false);
-                    }
+                    game.getAction().reveal(milled, p, false);
                     StringBuilder sb = new StringBuilder();
                     sb.append(p).append(" milled ").append(milled).append(" to ").append(destination);
                     p.getGame().getGameLog().add(GameLogEntryType.ZONE_CHANGE, sb.toString());
