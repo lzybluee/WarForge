@@ -427,10 +427,6 @@ public class TargetingOverlay {
     }
 
     private void addArcsForCard(final CardView c, final Map<Integer, Point> endpoints, final CombatView combat) {
-        if (!cardsVisualized.add(c)) {
-            return; //don't add arcs for cards if card already visualized
-        }
-
         final CardView attachedTo = c.getAttachedTo();
         final Iterable<CardView> attachedCards = c.getAttachedCards();
         final CardView paired = c.getPairedWith();
