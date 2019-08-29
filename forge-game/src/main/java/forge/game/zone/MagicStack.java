@@ -56,6 +56,7 @@ import forge.game.spellability.Spell;
 import forge.game.spellability.SpellAbility;
 import forge.game.spellability.SpellAbilityStackInstance;
 import forge.game.spellability.TargetChoices;
+import forge.game.staticability.StaticAbility;
 import forge.game.trigger.TriggerType;
 import forge.game.trigger.WrappedAbility;
 import forge.util.TextUtil;
@@ -536,6 +537,16 @@ public class MagicStack /* extends MyObservable */ implements Iterable<SpellAbil
             params.put("StackSi", si);
             params.put("Fizzle", fizzle);
             game.getAction().moveToGraveyard(source, null, params);
+            
+        	List<StaticAbility> toRemove = Lists.newArrayList();
+        	for (StaticAbility stAb : source.getStaticAbilities()) {
+                if (!stAb.isIntrinsic()) {
+                    toRemove.add(stAb);
+                }
+            }
+            for (StaticAbility stAb : toRemove) {
+            	source.removeStaticAbility(stAb);
+            }
         }
     }
 

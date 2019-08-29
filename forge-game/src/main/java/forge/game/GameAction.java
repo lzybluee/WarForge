@@ -803,14 +803,14 @@ public class GameAction {
                     if (stAb.isTemporary()) {
                         toRemove.add(stAb);
                     }
-                 }
-                 for (StaticAbility stAb : toRemove) {
-                     co.removeStaticAbility(stAb);
-                 }
-                 if (!co.getStaticCommandList().isEmpty()) {
-                     staticList.add(co);
-                 }
-                 return true;
+                }
+                for (StaticAbility stAb : toRemove) {
+                	co.removeStaticAbility(stAb);
+                }
+                if (!co.getStaticCommandList().isEmpty()) {
+                	staticList.add(co);
+            	}
+                return true;
             }
         });
 
