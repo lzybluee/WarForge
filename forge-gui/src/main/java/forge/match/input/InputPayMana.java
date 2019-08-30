@@ -313,7 +313,8 @@ public abstract class InputPayMana extends InputSyncronizedBase {
         // Filter the colors for the express choice so that only actually producible colors can be chosen
         int producedColorMask = 0;
         for (final byte color : ManaAtom.MANATYPES) {
-            if (chosen.getManaPartRecursive().getOrigProduced().contains(MagicColor.toShortString(color))
+            if ((chosen.getManaPartRecursive().getOrigProduced().contains(MagicColor.toShortString(color))
+            		|| "Any".equals(chosen.getManaPartRecursive().getOrigProduced()))
                     && colors.hasAnyColor(color)) {
                 producedColorMask |= color;
             }
