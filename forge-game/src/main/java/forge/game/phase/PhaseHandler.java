@@ -274,11 +274,11 @@ public class PhaseHandler implements java.io.Serializable {
                     break;
 
                 case COMBAT_BEGIN:
-                    combat = new Combat(playerTurn);
                     //PhaseUtil.verifyCombat();
                     break;
 
                 case COMBAT_DECLARE_ATTACKERS:
+                	combat = new Combat(playerTurn);
                     if (!playerTurn.hasLost()) {
                         game.getStack().freezeStack();
                         declareAttackersTurnBasedAction();
