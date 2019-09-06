@@ -730,6 +730,7 @@ S Sliver Legion
 S Smash to Smithereens
 S Smite the Monstrous
 S Snapcaster Mage
+S Sol Ring
 S Soltari Priest
 S Sorin, Vengeful Bloodlord
 S Soul of Ravnica
