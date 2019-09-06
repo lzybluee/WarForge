@@ -147,7 +147,7 @@ public final class ImageKeys {
             int index = filename.lastIndexOf('_');
             if (index != -1) {
                 String setlessFilename = filename.substring(0, index);
-                String setCode = filename.substring(index + 1, filename.length());
+                String setCode = filename.substring(index + 1);
                 file = findTokenImageFile(dir, setlessFilename, setCode);
                 if (file != null) { return file; }
                 file = findTokenImageFile(dir, setlessFilename.replace("_a_", "_"), setCode);
