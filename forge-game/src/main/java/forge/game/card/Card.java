@@ -123,6 +123,8 @@ public class Card extends GameEntity implements Comparable<Card> {
     private final NavigableMap<Long, CardCloneStates> clonedStates = Maps.newTreeMap();
     private final NavigableMap<Long, CardCloneStates> textChangeStates = Maps.newTreeMap();
 
+    private final Map<Long, Integer> canBlockAdditional = Maps.newTreeMap();
+    private final Set<Long> canBlockAny = Sets.newHashSet();
 
     // changes that say "replace each instance of one [color,type] by another - timestamp is the key of maps
     private final CardChangedWords changedTextColors = new CardChangedWords();
@@ -567,7 +569,7 @@ public class Card extends GameEntity implements Comparable<Card> {
             getGame().getTriggerHandler().registerActiveTrigger(this, false);
             Map<String, Object> runParams = Maps.newHashMap();
             runParams.put("Transformer", this);
-            getGame().getTriggerHandler().runTrigger(TriggerType.Transformed, runParams, false);
+            getGame().getTriggerHandler().runTriggerOld(TriggerType.Transformed, runParams, false);
             incrementTransformedTimestamp();
 
             return result;
@@ -687,7 +689,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                 getGame().getTriggerHandler().registerActiveTrigger(this, false);
                 final Map<String, Object> runParams = Maps.newTreeMap();
                 runParams.put("Card", this);
-                getGame().getTriggerHandler().runTrigger(TriggerType.TurnFaceUp, runParams, false);
+                getGame().getTriggerHandler().runTriggerOld(TriggerType.TurnFaceUp, runParams, false);
             }
             return result;
         }
@@ -1285,12 +1287,12 @@ public class Card extends GameEntity implements Comparable<Card> {
             runParams.put("CounterType", counterType);
             for (int i = 0; i < addAmount; i++) {
                 runParams.put("CounterAmount", oldValue + i + 1);
-                getGame().getTriggerHandler().runTrigger(
+                getGame().getTriggerHandler().runTriggerOld(
                         TriggerType.CounterAdded, Maps.newHashMap(runParams), false);
             }
             if (addAmount > 0) {
                 runParams.put("CounterAmount", addAmount);
-                getGame().getTriggerHandler().runTrigger(
+                getGame().getTriggerHandler().runTriggerOld(
                         TriggerType.CounterAddedOnce, Maps.newHashMap(runParams), false);
             }
         } else {
@@ -1366,10 +1368,10 @@ public class Card extends GameEntity implements Comparable<Card> {
         runParams.put("CounterType", counterName);
         for (int i = 0; i < delta && curCounters != 0; i++) {
             runParams.put("NewCounterAmount", --curCounters);
-            getGame().getTriggerHandler().runTrigger(TriggerType.CounterRemoved, runParams, false);
+            getGame().getTriggerHandler().runTriggerOld(TriggerType.CounterRemoved, runParams, false);
         }
         runParams.put("CounterAmount", delta);
-        getGame().getTriggerHandler().runTrigger(TriggerType.CounterRemovedOnce, runParams, false);
+        getGame().getTriggerHandler().runTriggerOld(TriggerType.CounterRemovedOnce, runParams, false);
     }
 
     @Override
@@ -1652,13 +1654,13 @@ public class Card extends GameEntity implements Comparable<Card> {
                         if (!mCost.isOnlyManaCost()) {
                             sbLong.append(".");
                         }
-                        sbLong.append(" (" + inst.getReminderText() + ")");
+                        sbLong.append(" (").append(inst.getReminderText()).append(")");
                         sbLong.append("\r\n");
                     }
                 } else if (keyword.startsWith("Emerge")) {
                     final String[] k = keyword.split(":");
                     sbLong.append(k[0]).append(" ").append(ManaCostParser.parse(k[1]));
-                    sbLong.append(" (" + inst.getReminderText() + ")");
+                    sbLong.append(" (").append(inst.getReminderText()).append(")");
                     sbLong.append("\r\n");
                 } else if (keyword.startsWith("Echo")) {
                     sbLong.append("Echo ");
@@ -1689,7 +1691,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                         final String[] n = keyword.split(":");
                         final Cost cost = new Cost(n[1], false);
                         sbLong.append("Multikicker ").append(cost.toSimpleString());
-                        sbLong.append(" (" + inst.getReminderText() + ")").append("\r\n");
+                        sbLong.append(" (").append(inst.getReminderText()).append(")").append("\r\n");
                     }
                 } else if (keyword.startsWith("Kicker")) {
                     if (!keyword.endsWith("Generic")) {
@@ -1703,7 +1705,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                             final Cost cost2 = new Cost(n[2], false);
                             sbx.append(cost2.toSimpleString());
                         }
-                        sbx.append(" (" + inst.getReminderText() + ")");
+                        sbx.append(" (").append(inst.getReminderText()).append(")");
                         sbLong.append(sbx).append("\r\n");
                     }
                 } else if (keyword.startsWith("Hexproof:")) {
@@ -1733,10 +1735,10 @@ public class Card extends GameEntity implements Comparable<Card> {
                         || keyword.equals("Hideaway") || keyword.equals("Ascend")
                         || keyword.equals("Totem armor") || keyword.equals("Battle cry")
                         || keyword.equals("Devoid") || keyword.equals("Riot")){
-                    sbLong.append(keyword + " (" + inst.getReminderText() + ")");
+                    sbLong.append(keyword).append(" (").append(inst.getReminderText()).append(")");
                 } else if (keyword.startsWith("Partner:")) {
                     final String[] k = keyword.split(":");
-                    sbLong.append("Partner with " + k[1] + " (" + inst.getReminderText() + ")");
+                    sbLong.append("Partner with ").append(k[1]).append(" (").append(inst.getReminderText()).append(")");
                 } else if (keyword.startsWith("Modular") || keyword.startsWith("Bloodthirst") || keyword.startsWith("Dredge")
                         || keyword.startsWith("Fabricate") || keyword.startsWith("Soulshift") || keyword.startsWith("Bushido")
                         || keyword.startsWith("Crew") || keyword.startsWith("Tribute") || keyword.startsWith("Absorb")
@@ -1745,7 +1747,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                         || keyword.startsWith("Afflict") || keyword.startsWith ("Poisonous") || keyword.startsWith("Rampage")
                         || keyword.startsWith("Renown") || keyword.startsWith("Annihilator") || keyword.startsWith("Devour")) {
                     final String[] k = keyword.split(":");
-                    sbLong.append(k[0] + " " + k[1] + " (" + inst.getReminderText() + ")");
+                    sbLong.append(k[0]).append(" ").append(k[1]).append(" (").append(inst.getReminderText()).append(")");
                 } else if (keyword.contains("Haunt")) {
                     sb.append("\r\nHaunt (");
                     if (isCreature()) {
@@ -1766,14 +1768,14 @@ public class Card extends GameEntity implements Comparable<Card> {
                     if (sb.length() != 0) {
                         sb.append("\r\n");
                     }
-                    sb.append(keyword + " (" + inst.getReminderText() + ")");
+                    sb.append(keyword).append(" (").append(inst.getReminderText()).append(")");
                 } else if (keyword.endsWith(" offering")) {
                     String offeringType = keyword.split(" ")[0];
                     if (sb.length() != 0) {
                         sb.append("\r\n");
                     }
                     sbLong.append(keyword);
-                    sbLong.append(" (" + Keyword.getInstance("Offering:"+ offeringType).getReminderText() + ")");
+                    sbLong.append(" (").append(Keyword.getInstance("Offering:" + offeringType).getReminderText()).append(")");
                 } else if (keyword.startsWith("Equip") || keyword.startsWith("Fortify") || keyword.startsWith("Outlast")
                         || keyword.startsWith("Unearth") || keyword.startsWith("Scavenge") || keyword.startsWith("Spectacle")
                         || keyword.startsWith("Evoke") || keyword.startsWith("Bestow") || keyword.startsWith("Dash")
@@ -1935,7 +1937,7 @@ public class Card extends GameEntity implements Comparable<Card> {
             String meld = this.getRules().getMeldWith();
             if (meld != "" && (!hasMeldEffect)) {
                 sb.append("\r\n");
-                sb.append("(Melds with " + meld + ".)");
+                sb.append("(Melds with ").append(meld).append(".)");
                 sb.append("\r\n");
             }
         }
@@ -2042,9 +2044,10 @@ public class Card extends GameEntity implements Comparable<Card> {
         }
 
         if (isGoaded()) {
-            sb.append("is goaded by: " + Lang.joinHomogenous(getGoaded()));
+            sb.append("is goaded by: ").append(Lang.joinHomogenous(getGoaded()));
             sb.append("\r\n");
         }
+
         // replace triple line feeds with double line feeds
         int start;
         final String s = "\r\n\r\n\r\n";
@@ -2104,17 +2107,17 @@ public class Card extends GameEntity implements Comparable<Card> {
                         || keyword.equals("Undaunted") || keyword.equals("Cascade")
                         || keyword.equals("Devoid") ||  keyword.equals("Lifelink")
                         || keyword.equals("Split second")) {
-                    sbBefore.append(keyword + " (" + inst.getReminderText() + ")");
+                    sbBefore.append(keyword).append(" (").append(inst.getReminderText()).append(")");
                     sbBefore.append("\r\n");
                 } else if(keyword.equals("Conspire") || keyword.equals("Epic")
                         || keyword.equals("Suspend") || keyword.equals("Jump-start")) {
-                    sbAfter.append(keyword + " (" + inst.getReminderText() + ")");
+                    sbAfter.append(keyword).append(" (").append(inst.getReminderText()).append(")");
                     sbAfter.append("\r\n");
                 } else if (keyword.startsWith("Ripple")) {
-                    sbBefore.append(TextUtil.fastReplace(keyword, ":", " ") + " (" + inst.getReminderText() + ")");
+                    sbBefore.append(TextUtil.fastReplace(keyword, ":", " ")).append(" (").append(inst.getReminderText()).append(")");
                     sbBefore.append("\r\n");
                 } else if (keyword.startsWith("Dredge")) {
-                    sbAfter.append(TextUtil.fastReplace(keyword, ":", " ") + " (" + inst.getReminderText() + ")");
+                    sbAfter.append(TextUtil.fastReplace(keyword, ":", " ")).append(" (").append(inst.getReminderText()).append(")");
                     sbAfter.append("\r\n");
                 } else if (keyword.startsWith("Escalate") || keyword.startsWith("Buyback")
                         || keyword.startsWith("Prowl")) {
@@ -2129,14 +2132,13 @@ public class Card extends GameEntity implements Comparable<Card> {
                         sbCost.append(" ");
                     }
                     sbCost.append(cost.toSimpleString());
-                    sbBefore.append(sbCost + " (" + inst.getReminderText() + ")");
+                    sbBefore.append(sbCost).append(" (").append(inst.getReminderText()).append(")");
                     sbBefore.append("\r\n");
                 } else if (keyword.startsWith("Multikicker")) {
                     if (!keyword.endsWith("Generic")) {
                         final String[] n = keyword.split(":");
                         final Cost cost = new Cost(n[1], false);
-                        sbBefore.append("Multikicker ").append(cost.toSimpleString())
-                        .append(" (" + inst.getReminderText() + ")").append("\r\n");
+                        sbBefore.append("Multikicker ").append(cost.toSimpleString()).append(" (").append(inst.getReminderText()).append(")").append("\r\n");
                     }
                 } else if (keyword.startsWith("Kicker")) {
                     if (!keyword.endsWith("Generic")) {
@@ -2150,7 +2152,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                                 final Cost cost2 = new Cost(n[2], false);
                             sbx.append(cost2.toSimpleString());
                         }
-                        sbx.append(" (" + inst.getReminderText() + ")");
+                        sbx.append(" (").append(inst.getReminderText()).append(")");
                         sbBefore.append(sbx).append("\r\n");
                     }
                 }else if (keyword.startsWith("AlternateAdditionalCost")) {
@@ -2179,7 +2181,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                         sbCost.append(" ");
                     }
                     sbCost.append(cost.toSimpleString());
-                    sbAfter.append(sbCost + " (" + inst.getReminderText() + ")");
+                    sbAfter.append(sbCost).append(" (").append(inst.getReminderText()).append(")");
                     sbAfter.append("\r\n");
                 } else if (keyword.equals("CARDNAME can't be countered.") ||
                         keyword.equals("Remove CARDNAME from your deck before playing if you're not playing for ante.")) {
@@ -2209,7 +2211,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                     }
 
                     sbAfter.append("Splice onto ").append(desc).append(" ").append(cost.toSimpleString());
-                    sbAfter.append(" (" + inst.getReminderText() + ")").append("\r\n");
+                    sbAfter.append(" (").append(inst.getReminderText()).append(")").append("\r\n");
                 } else if (keyword.equals("Storm")) {
                     sbAfter.append("Storm (");
 
@@ -2936,7 +2938,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         final Map<String, Object> runParams = Maps.newHashMap();
         runParams.put("AttachSource", this);
         runParams.put("AttachTarget", entity);
-        getController().getGame().getTriggerHandler().runTrigger(TriggerType.Attached, runParams, false);
+        getController().getGame().getTriggerHandler().runTriggerOld(TriggerType.Attached, runParams, false);
 
     }
 
@@ -2958,7 +2960,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         final Map<String, Object> runParams = Maps.newTreeMap();
         runParams.put("Attach", this);
         runParams.put("Object", entity);
-        getGame().getTriggerHandler().runTrigger(TriggerType.Unattach, runParams, false);
+        getGame().getTriggerHandler().runTriggerOld(TriggerType.Unattach, runParams, false);
         runUnattachCommands();
     }
 
@@ -3517,7 +3519,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         final Map<String, Object> runParams = Maps.newTreeMap();
         runParams.put("Card", this);
         runParams.put("Attacker", attacker);
-        getGame().getTriggerHandler().runTrigger(TriggerType.Taps, runParams, false);
+        getGame().getTriggerHandler().runTriggerOld(TriggerType.Taps, runParams, false);
 
         setTapped(true);
         getGame().fireEvent(new GameEventCardTapped(this, true));
@@ -3538,7 +3540,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         // Run triggers
         final Map<String, Object> runParams = Maps.newTreeMap();
         runParams.put("Card", this);
-        getGame().getTriggerHandler().runTrigger(TriggerType.Untaps, runParams, false);
+        getGame().getTriggerHandler().runTriggerOld(TriggerType.Untaps, runParams, false);
 
         for (final GameCommand var : untapCommandList) {
             var.run();
@@ -4112,7 +4114,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         if (!isPhasedOut()) {
             // If this is currently PhasedIn, it's about to phase out.
             // Run trigger before it does because triggers don't work with phased out objects
-            getGame().getTriggerHandler().runTrigger(TriggerType.PhaseOut, runParams, false);
+            getGame().getTriggerHandler().runTriggerOld(TriggerType.PhaseOut, runParams, false);
         }
 
         setPhasedOut(!phasedOut);
@@ -4124,7 +4126,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         if (!phasedOut) {
             // Just phased in, time to run the phased in trigger
             getGame().getTriggerHandler().registerActiveTrigger(this, false);
-            getGame().getTriggerHandler().runTrigger(TriggerType.PhaseIn, runParams, false);
+            getGame().getTriggerHandler().runTriggerOld(TriggerType.PhaseIn, runParams, false);
         }
 
         return true;
@@ -4917,7 +4919,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         }
         // Defending player at the time the damage was dealt
         runParams.put("DefendingPlayer", game.getCombat() != null ? game.getCombat().getDefendingPlayerRelatedTo(source) : null);
-        getGame().getTriggerHandler().runTrigger(TriggerType.DamageDone, runParams, false);
+        getGame().getTriggerHandler().runTriggerOld(TriggerType.DamageDone, runParams, false);
 
         GameEventCardDamaged.DamageType damageType = DamageType.Normal;
         if (isPlaneswalker()) {
@@ -5018,7 +5020,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         final Map<String, Object> runParams = Maps.newHashMap();
         runParams.put("Card", this);
         runParams.put("Player", getController());
-        game.getTriggerHandler().runTrigger(TriggerType.Exerted, runParams, false);
+        game.getTriggerHandler().runTriggerOld(TriggerType.Exerted, runParams, false);
     }
 
     public boolean isExertedBy(final Player player) {
@@ -6233,5 +6235,46 @@ public class Card extends GameEntity implements Comparable<Card> {
         planeswalkerAbilityActivated = 0;
         numberTurnActivations.clear();
         numberTurnActivationsStatic.clear();
+    }
+
+    public void addCanBlockAdditional(int n, long timestamp) {
+        if (n <= 0) {
+            return;
+        }
+        canBlockAdditional.put(timestamp, n);
+        getView().updateBlockAdditional(this);
+    }
+
+    public boolean removeCanBlockAdditional(long timestamp) {
+        boolean result = canBlockAdditional.remove(timestamp) != null;
+        if (result) {
+            getView().updateBlockAdditional(this);
+        }
+        return result;
+    }
+
+    public int canBlockAdditional() {
+        int result = 0;
+        for (Integer v : canBlockAdditional.values()) {
+            result += v;
+        }
+        return result;
+    }
+
+    public void addCanBlockAny(long timestamp) {
+        canBlockAny.add(timestamp);
+        getView().updateBlockAdditional(this);
+    }
+
+    public boolean removeCanBlockAny(long timestamp) {
+        boolean result = canBlockAny.remove(timestamp);
+        if (result) {
+            getView().updateBlockAdditional(this);
+        }
+        return result;
+    }
+
+    public boolean canBlockAny() {
+        return !canBlockAny.isEmpty();
     }
 }

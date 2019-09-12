@@ -31,10 +31,7 @@ import forge.game.trigger.TriggerType;
 import forge.game.zone.ZoneType;
 import forge.util.MyRandom;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AttachAi extends SpellAbilityAi {
 
@@ -451,7 +448,7 @@ public class AttachAi extends SpellAbilityAi {
      */
     private static Player attachToPlayerAIPreferences(final Player aiPlayer, final SpellAbility sa,
             final boolean mandatory) {
-        List<Player> targetable = new ArrayList<Player>();
+        List<Player> targetable = new ArrayList<>();
         for (final Player player : aiPlayer.getGame().getPlayers()) {
             if (sa.canTarget(player)) {
                 targetable.add(player);
@@ -855,7 +852,7 @@ public class AttachAi extends SpellAbilityAi {
 
         int totToughness = 0;
         int totPower = 0;
-        final List<String> keywords = new ArrayList<String>();
+        final List<String> keywords = new ArrayList<>();
 
         for (final StaticAbility stAbility : attachSource.getStaticAbilities()) {
             final Map<String, String> stabMap = stAbility.getMapParams();
@@ -875,15 +872,11 @@ public class AttachAi extends SpellAbilityAi {
 
                 String kws = stabMap.get("AddKeyword");
                 if (kws != null) {
-                    for (final String kw : kws.split(" & ")) {
-                        keywords.add(kw);
-                    }
+                    keywords.addAll(Arrays.asList(kws.split(" & ")));
                 }
                 kws = stabMap.get("AddHiddenKeyword");
                 if (kws != null) {
-                    for (final String kw : kws.split(" & ")) {
-                        keywords.add(kw);
-                    }
+                    keywords.addAll(Arrays.asList(kws.split(" & ")));
                 }
             }
         }
@@ -906,7 +899,7 @@ public class AttachAi extends SpellAbilityAi {
 
         Card c = null;
         if (prefList == null || prefList.isEmpty()) {
-            prefList = new ArrayList<Card>(list);
+            prefList = new ArrayList<>(list);
         } else {
             c = ComputerUtilCard.getBestAI(prefList);
             if (c != null) {
@@ -960,7 +953,7 @@ public class AttachAi extends SpellAbilityAi {
     protected boolean doTriggerAINoCost(final Player ai, final SpellAbility sa, final boolean mandatory) {
         final Card card = sa.getHostCard();
         // Check if there are any valid targets
-        List<GameObject> targets = new ArrayList<GameObject>();
+        List<GameObject> targets = new ArrayList<>();
         final TargetRestrictions tgt = sa.getTargetRestrictions();
         if (tgt == null) {
             targets = AbilityUtils.getDefinedObjects(sa.getHostCard(), sa.getParam("Defined"), sa);
@@ -1150,8 +1143,9 @@ public class AttachAi extends SpellAbilityAi {
 
         int totToughness = 0;
         int totPower = 0;
-        final List<String> keywords = new ArrayList<String>();
+        final List<String> keywords = new ArrayList<>();
         boolean grantingAbilities = false;
+        boolean grantingExtraBlock = false;
 
         for (final StaticAbility stAbility : attachSource.getStaticAbilities()) {
             final Map<String, String> stabMap = stAbility.getMapParams();
@@ -1170,18 +1164,15 @@ public class AttachAi extends SpellAbilityAi {
                 totPower += AbilityUtils.calculateAmount(attachSource, stabMap.get("AddPower"), stAbility);
 
                 grantingAbilities |= stabMap.containsKey("AddAbility");
+                grantingExtraBlock |= stabMap.containsKey("CanBlockAmount") || stabMap.containsKey("CanBlockAny");
 
                 String kws = stabMap.get("AddKeyword");
                 if (kws != null) {
-                    for (final String kw : kws.split(" & ")) {
-                        keywords.add(kw);
-                    }
+                    keywords.addAll(Arrays.asList(kws.split(" & ")));
                 }
                 kws = stabMap.get("AddHiddenKeyword");
                 if (kws != null) {
-                    for (final String kw : kws.split(" & ")) {
-                        keywords.add(kw);
-                    }
+                    keywords.addAll(Arrays.asList(kws.split(" & ")));
                 }
             }
         }
@@ -1203,18 +1194,25 @@ public class AttachAi extends SpellAbilityAi {
         }
 
         //only add useful keywords unless P/T bonus is significant
-        if (totToughness + totPower < 4 && !keywords.isEmpty()) {
+        if (totToughness + totPower < 4 && (!keywords.isEmpty() || grantingExtraBlock)) {
             final int pow = totPower;
+            final boolean extraBlock = grantingExtraBlock;
             prefList = CardLists.filter(prefList, new Predicate<Card>() {
                 @Override
                 public boolean apply(final Card c) {
-                    for (final String keyword : keywords) {
-                        if (isUsefulAttachKeyword(keyword, c, sa, pow)) {
-                            return true;
+                    if (!keywords.isEmpty()) {
+                        for (final String keyword : keywords) {
+                            if (isUsefulAttachKeyword(keyword, c, sa, pow)) {
+                                return true;
+                            }
                         }
                     }
+
                     if (c.hasKeyword(Keyword.INFECT) && pow >= 2) {
                         // consider +2 power a significant bonus on Infect creatures
+                        return true;
+                    }
+                    if (extraBlock && CombatUtil.canBlock(c, true) && !c.canBlockAny()) {
                         return true;
                     }
                     return false;
@@ -1592,9 +1590,6 @@ public class AttachAi extends SpellAbilityAi {
                     && CombatUtil.canBlock(card, true);
         } else if (keyword.equals("Reach")) {
             return !card.hasKeyword(Keyword.FLYING) && CombatUtil.canBlock(card, true);
-        } else if (keyword.endsWith("CARDNAME can block an additional creature each combat.")) {
-            return CombatUtil.canBlock(card, true) && !card.hasKeyword("CARDNAME can block any number of creatures.")
-                    && !card.hasKeyword("CARDNAME can block an additional ninety-nine creatures each combat.");
         } else if (keyword.equals("CARDNAME can attack as though it didn't have defender.")) {
             return card.hasKeyword(Keyword.DEFENDER) && card.getNetCombatDamage() + powerBonus > 0;
         } else if (keyword.equals("Shroud") || keyword.equals("Hexproof")) {

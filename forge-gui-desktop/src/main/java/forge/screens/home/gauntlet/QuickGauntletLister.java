@@ -63,9 +63,9 @@ public class QuickGauntletLister extends JPanel {
 
     public void refresh() {
         this.removeAll();
-        final List<RowPanel> tempRows = new ArrayList<RowPanel>();
-        final List<GauntletData> sorted = new ArrayList<GauntletData>();
-        for (final GauntletData gd : gauntlets) { sorted.add(gd); }
+        final List<RowPanel> tempRows = new ArrayList<>();
+        final List<GauntletData> sorted = new ArrayList<>();
+        sorted.addAll(gauntlets);
         Collections.sort(sorted, new Comparator<GauntletData>() {
             @Override
             public int compare(final GauntletData x, final GauntletData y) {

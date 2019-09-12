@@ -22,7 +22,7 @@ public class BlockEffect extends SpellAbilityEffect {
         final Game game = host.getGame();
         final Combat combat = game.getPhaseHandler().getCombat();
 
-        List<Card> attackers = new ArrayList<Card>();
+        List<Card> attackers = new ArrayList<>();
         if (sa.hasParam("DefinedAttacker")) {
             for (final Card attacker : AbilityUtils.getDefinedCards(sa.getHostCard(), sa.getParam("DefinedAttacker"), sa)) {
                 if (combat.isAttacking(attacker))
@@ -30,7 +30,7 @@ public class BlockEffect extends SpellAbilityEffect {
             }
         }
 
-        List<Card> blockers = new ArrayList<Card>();
+        List<Card> blockers = new ArrayList<>();
         if (sa.hasParam("DefinedBlocker")) {
             for (final Card blocker : AbilityUtils.getDefinedCards(sa.getHostCard(), sa.getParam("DefinedBlocker"), sa)) {
                 if (blocker.isCreature() && blocker.isInZone(ZoneType.Battlefield))
@@ -56,12 +56,12 @@ public class BlockEffect extends SpellAbilityEffect {
                 Map<String, Object> runParams = Maps.newHashMap();
                 runParams.put("Attacker", attacker);
                 runParams.put("Blocker", blocker);
-                game.getTriggerHandler().runTrigger(TriggerType.AttackerBlockedByCreature, runParams, false);
+                game.getTriggerHandler().runTriggerOld(TriggerType.AttackerBlockedByCreature, runParams, false);
 
                 runParams = Maps.newHashMap();
                 runParams.put("Blocker", blocker);
                 runParams.put("Attackers", attacker);
-                game.getTriggerHandler().runTrigger(TriggerType.Blocks, runParams, false);
+                game.getTriggerHandler().runTriggerOld(TriggerType.Blocks, runParams, false);
             }
 
             attacker.getDamageHistory().setCreatureGotBlockedThisCombat(true);
@@ -72,7 +72,7 @@ public class BlockEffect extends SpellAbilityEffect {
                 runParams.put("NumBlockers", blockers.size());
                 runParams.put("Defender", combat.getDefenderByAttacker(attacker));
                 runParams.put("DefendingPlayer", combat.getDefenderPlayerByAttacker(attacker));
-                game.getTriggerHandler().runTrigger(TriggerType.AttackerBlocked, runParams, false);
+                game.getTriggerHandler().runTriggerOld(TriggerType.AttackerBlocked, runParams, false);
 
                 combat.orderBlockersForDamageAssignment(attacker, new CardCollection(blockers));
             }
@@ -90,14 +90,14 @@ public class BlockEffect extends SpellAbilityEffect {
 
         // end standard pre-
 
-        List<String> attackers = new ArrayList<String>();
+        List<String> attackers = new ArrayList<>();
         if (sa.hasParam("DefinedAttacker")) {
             for (final Card attacker : AbilityUtils.getDefinedCards(sa.getHostCard(), sa.getParam("DefinedAttacker"), sa)) {
                 attackers.add(attacker.toString());
             }
         }
 
-        List<String> blockers = new ArrayList<String>();
+        List<String> blockers = new ArrayList<>();
         if (sa.hasParam("DefinedBlocker")) {
             for (final Card blocker : AbilityUtils.getDefinedCards(sa.getHostCard(), sa.getParam("DefinedBlocker"), sa)) {
                 blockers.add(blocker.toString());

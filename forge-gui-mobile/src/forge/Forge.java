@@ -10,6 +10,7 @@ import forge.assets.AssetsDownloader;
 import forge.assets.FSkin;
 import forge.assets.FSkinFont;
 import forge.assets.ImageCache;
+import forge.card.CardTranslation;
 import forge.error.BugReporter;
 import forge.error.ExceptionHandler;
 import forge.interfaces.IDeviceAdapter;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Stack;
 
 public class Forge implements ApplicationListener {
-    public static final String CURRENT_VERSION = "1.6.28.001";
+    public static final String CURRENT_VERSION = "1.6.28.002";
 
     private static final ApplicationListener app = new Forge();
     private static Clipboard clipboard;
@@ -47,11 +48,12 @@ public class Forge implements ApplicationListener {
     private static KeyInputAdapter keyInputAdapter;
     private static boolean exited;
     private static int continuousRenderingCount = 1; //initialize to 1 since continuous rendering is the default
-    private static final Stack<FScreen> screens = new Stack<FScreen>();
+    private static final Stack<FScreen> screens = new Stack<>();
     private static boolean textureFiltering = false;
     private static boolean destroyThis = false;
     public static String extrawide = "default";
-    public static  float heigtModifier = 0.0f;
+    public static float heigtModifier = 0.0f;
+    private static boolean isloadingaMatch = false;
 
     public static ApplicationListener getApp(Clipboard clipboard0, IDeviceAdapter deviceAdapter0, String assetDir0) {
         if (GuiBase.getInterface() == null) {
@@ -106,6 +108,9 @@ public class Forge implements ApplicationListener {
 
                 splashScreen.getProgressBar().setDescription("Loading fonts...");
                 FSkinFont.preloadAll();
+
+                splashScreen.getProgressBar().setDescription("Loading card translations...");
+                CardTranslation.preloadTranslation(prefs.getPref(FPref.UI_LANGUAGE));
 
                 splashScreen.getProgressBar().setDescription("Finishing startup...");
 
@@ -307,6 +312,14 @@ public class Forge implements ApplicationListener {
         return screenWidth > screenHeight;
     }
 
+    public static boolean isLoadingaMatch() {
+        return isloadingaMatch;
+    }
+
+    public static void setLoadingaMatch(boolean value) {
+        isloadingaMatch = value;
+    }
+
     public static int getScreenWidth() {
         return screenWidth;
     }
@@ -486,7 +499,7 @@ public class Forge implements ApplicationListener {
     }
 
     private static class MainInputProcessor extends FGestureAdapter {
-        private static final List<FDisplayObject> potentialListeners = new ArrayList<FDisplayObject>();
+        private static final List<FDisplayObject> potentialListeners = new ArrayList<>();
         private static char lastKeyTyped;
         private static boolean keyTyped, shiftKeyDown;
 

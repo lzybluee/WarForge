@@ -133,7 +133,7 @@ public class CardRenderer {
         return Math.round(MANA_SYMBOL_SIZE + FSkinFont.get(12).getLineHeight() + 3 * FList.PADDING + 1);
     }
 
-    private static final Map<String, FImageComplex> cardArtCache = new HashMap<String, FImageComplex>();
+    private static final Map<String, FImageComplex> cardArtCache = new HashMap<>();
     public static final float CARD_ART_RATIO = 1.302f;
     public static final float CARD_ART_HEIGHT_PERCENTAGE = 0.43f;
 
@@ -255,7 +255,7 @@ public class CardRenderer {
                     state.getLoyalty(), count, suffix, x, y, w, h, compactMode);
         }
         else { //if fake card, just draw card name centered
-            String name = state.getName();
+            String name = CardTranslation.getTranslatedName(state.getName());
             if (count > 0) { //preface name with count if applicable
                 name = count + " " + name;
             }
@@ -317,7 +317,7 @@ public class CardRenderer {
         CardFaceSymbols.drawManaCost(g, mainManaCost, x + w - manaCostWidth, y, MANA_SYMBOL_SIZE);
 
         x += cardArtWidth;
-        String name = card.getCurrentState().getName();
+        String name = CardTranslation.getTranslatedName(card.getCurrentState().getName());
         if (count > 0) { //preface name with count if applicable
             name = count + " " + name;
         }
@@ -448,7 +448,7 @@ public class CardRenderer {
         //draw name and mana cost overlays if card is small or default card image being used
         if (h <= NAME_COST_THRESHOLD && canShow) {
             if (showCardNameOverlay(card)) {
-                g.drawOutlinedText(details.getName(), FSkinFont.forHeight(h * 0.18f), Color.WHITE, Color.BLACK, x + padding, y + padding, w - 2 * padding, h * 0.4f, true, Align.left, false);
+                g.drawOutlinedText(CardTranslation.getTranslatedName(details.getName()), FSkinFont.forHeight(h * 0.18f), Color.WHITE, Color.BLACK, x + padding, y + padding, w - 2 * padding, h * 0.4f, true, Align.left, false);
             }
             if (showCardManaCostOverlay(card)) {
                 float manaSymbolSize = w / 4;
@@ -651,7 +651,7 @@ public class CardRenderer {
     private static void drawPtBox(Graphics g, CardView card, CardStateView details, Color color, float x, float y, float w, float h) {
         //use array of strings to render separately with a tiny amount of space in between
         //instead of using actual spaces which are too wide
-        List<String> pieces = new ArrayList<String>();
+        List<String> pieces = new ArrayList<>();
         if (details.isCreature()) {
             pieces.add(String.valueOf(details.getPower()));
             pieces.add("/");
@@ -678,7 +678,7 @@ public class CardRenderer {
         FSkinFont font = FSkinFont.forHeight(h * 0.15f);
         float padding = Math.round(font.getCapHeight() / 4);
         float boxWidth = padding;
-        List<Float> pieceWidths = new ArrayList<Float>();
+        List<Float> pieceWidths = new ArrayList<>();
         for (String piece : pieces) {
             float pieceWidth = font.getBounds(piece).width + padding;
             pieceWidths.add(pieceWidth);

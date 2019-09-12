@@ -59,7 +59,7 @@ import java.util.Map;
 public class CombatUtil {
 
     public static FCollectionView<GameEntity> getAllPossibleDefenders(final Player playerWhoAttacks) {
-        final FCollection<GameEntity> defenders = new FCollection<GameEntity>();
+        final FCollection<GameEntity> defenders = new FCollection<>();
         for (final Player defender : playerWhoAttacks.getOpponents()) {
             defenders.add(defender);
             final CardCollection planeswalkers = CardLists.filter(defender.getCardsIn(ZoneType.Battlefield), CardPredicates.Presets.PLANESWALKERS);
@@ -313,7 +313,7 @@ public class CombatUtil {
         runParams.put("Attacked", combat.getDefenderByAttacker(c));
         runParams.put("DefendingPlayer", combat.getDefenderPlayerByAttacker(c));
         runParams.put("Defenders", combat.getDefenders());
-        game.getTriggerHandler().runTrigger(TriggerType.Attacks, runParams, false);
+        game.getTriggerHandler().runTriggerOld(TriggerType.Attacks, runParams, false);
 
         c.getDamageHistory().setCreatureAttackedThisCombat(true);
         c.getDamageHistory().clearNotAttackedSinceLastUpkeepOf();
@@ -430,18 +430,11 @@ public class CombatUtil {
     }
 
     public static boolean canBlockMoreCreatures(final Card blocker, final CardCollectionView blockedBy) {
-        if (blockedBy.isEmpty() || blocker.hasKeyword("CARDNAME can block any number of creatures.")) {
+        if (blockedBy.isEmpty() || blocker.canBlockAny()) {
             return true;
         }
-        int canBlockMore = numberOfAdditionalCreaturesCanBlock(blocker);
+        int canBlockMore = blocker.canBlockAdditional();
         return canBlockMore >= blockedBy.size();
-    }
-
-    public static int numberOfAdditionalCreaturesCanBlock(final Card blocker) {
-        // If Wizards makes a few more of these, we should really just make a generic version
-        return blocker.getAmountOfKeyword("CARDNAME can block an additional creature each combat.") +
-                blocker.getAmountOfKeyword("CARDNAME can block an additional ninety-nine creatures.") * 99 +
-                blocker.getAmountOfKeyword("CARDNAME can block an additional seven creatures each combat.") * 7;
     }
 
     // can the attacker be blocked at all?

@@ -92,7 +92,7 @@ public final class SItemManagerUtil {
     }
 
     public static String getItemDisplayString(final InventoryItem item, final int qty, final boolean forTitle) {
-        final List<InventoryItem> items = new ArrayList<InventoryItem>();
+        final List<InventoryItem> items = new ArrayList<>();
         items.add(item);
         return getItemDisplayString(items, qty, forTitle);
     }
@@ -143,7 +143,7 @@ public final class SItemManagerUtil {
     }
 
     public static String buildDisplayList(final Iterable<Entry<InventoryItem, Integer>> items) {
-        final List<Entry<InventoryItem, Integer>> sorted = new ArrayList<Entry<InventoryItem, Integer>>();
+        final List<Entry<InventoryItem, Integer>> sorted = new ArrayList<>();
         for (final Entry<InventoryItem, Integer> itemEntry : items) {
             sorted.add(itemEntry);
         }
@@ -155,7 +155,7 @@ public final class SItemManagerUtil {
         });
         final StringBuilder builder = new StringBuilder();
         for (final Entry<InventoryItem, Integer> itemEntry : sorted) {
-            builder.append("\n" + itemEntry.getValue() + " * " + itemEntry.getKey().toString());
+            builder.append("\n").append(itemEntry.getValue()).append(" * ").append(itemEntry.getKey().toString());
         }
         return builder.toString();
     }

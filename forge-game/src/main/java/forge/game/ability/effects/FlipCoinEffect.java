@@ -35,7 +35,7 @@ public class FlipCoinEffect extends SpellAbilityEffect {
 
         sb.append(player).append(" flips a coin.");
         if (tgts != null && !tgts.isEmpty()) {
-        	sb.append(" Targeting: " + tgts + ".");
+        	sb.append(" Targeting: ").append(tgts).append(".");
         }
         return sb.toString();
     }
@@ -212,7 +212,7 @@ public class FlipCoinEffect extends SpellAbilityEffect {
             Map<String,Object> runParams = Maps.newHashMap();
             runParams.put("Player", caller);
             runParams.put("Result", Boolean.valueOf(wonFlip));
-            caller.getGame().getTriggerHandler().runTrigger(TriggerType.FlippedCoin, runParams, false);
+            caller.getGame().getTriggerHandler().runTriggerOld(TriggerType.FlippedCoin, runParams, false);
         } while (sa.hasParam("FlipUntilYouLose") && wonFlip);
         
         if (sa.hasParam("FlipUntilYouLose") && sa.hasAdditionalAbility("LoseSubAbility")) {
