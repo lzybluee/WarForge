@@ -22,6 +22,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DiscardEffect extends SpellAbilityEffect {
@@ -249,6 +250,7 @@ public class DiscardEffect extends SpellAbilityEffect {
 
                         for (Card c : toDiscard) {
                             c.getController().discard(c, sa, table);
+                            discarded.add(c);
                         }
                     }
                 }
@@ -317,7 +319,7 @@ public class DiscardEffect extends SpellAbilityEffect {
                     int min = sa.hasParam("AnyNumber") || sa.hasParam("Optional") ? 0 : Math.min(validCards.size(), numCards);
                     int max = sa.hasParam("AnyNumber") ? validCards.size() : Math.min(validCards.size(), numCards);
 
-                    CardCollectionView toBeDiscarded = validCards.isEmpty() ? null : chooser.getController().chooseCardsToDiscardFrom(p, sa, validCards, min, max);
+                    CardCollectionView toBeDiscarded =  (validCards.isEmpty() || (max == 0 && min == 0)) ? null : chooser.getController().chooseCardsToDiscardFrom(p, sa, validCards, min, max);
 
                     if (toBeDiscarded != null) {
                         if (toBeDiscarded.size() > 1) {
@@ -347,5 +349,20 @@ public class DiscardEffect extends SpellAbilityEffect {
 
         // run trigger if something got milled
         table.triggerChangesZoneAll(source.getGame());
+        
+        HashMap<Player, CardCollection> revealCards = new HashMap<>();
+        for(Card c : discarded) {
+            Player p = c.getOwner();
+            if(!revealCards.containsKey(p)) {
+                revealCards.put(p, new CardCollection());
+            }
+            revealCards.get(c.getOwner()).add(c);
+        }
+
+        for(Player p : discarders) {
+            if(revealCards.containsKey(p)) {
+                p.getGame().getAction().reveal(revealCards.get(p), p, !mode.equals("Random"));
+            }
+        }
     } // discardResolve()
 }
