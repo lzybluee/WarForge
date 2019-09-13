@@ -1067,6 +1067,10 @@ public class GameAction {
 
         game.getTracker().unfreeze();
 
+        for (final Card c : game.getCardsIn(ZoneType.Battlefield)) {
+        	c.updateController();
+        }
+
         if (runEvents && !affectedCards.isEmpty()) {
             game.fireEvent(new GameEventCardStatsChanged(affectedCards));
         }

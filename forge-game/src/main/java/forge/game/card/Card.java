@@ -2714,6 +2714,10 @@ public class Card extends GameEntity implements Comparable<Card> {
         return owner;
     }
 
+    public final void updateController() {
+    	view.updateController(this);
+    }
+    
     public final void setController(final Player player, final long tstamp) {
         tempControllers.clear();
         controller = player;
