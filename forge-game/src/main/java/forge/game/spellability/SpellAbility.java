@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import forge.card.mana.ManaCost;
 import forge.game.*;
 import forge.game.ability.AbilityFactory;
+import forge.game.ability.AbilityKey;
 import forge.game.ability.AbilityUtils;
 import forge.game.ability.ApiType;
 import forge.game.card.Card;
@@ -117,6 +118,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
 
     private boolean basicLandAbility = false;
 
+    private boolean adventure = false;
     private SplitSide splitSide = null;
     enum SplitSide { LEFT, RIGHT }
 
@@ -138,7 +140,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
 
     private HashMap<String, CardCollection> paidLists = Maps.newHashMap();
 
-    private Map<String, Object> triggeringObjects = Maps.newHashMap();
+    private EnumMap<AbilityKey, Object> triggeringObjects = AbilityKey.newMap();
 
     private HashMap<String, Object> replacingObjects = Maps.newHashMap();
 
@@ -205,7 +207,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
     }
     @Override
     public int hashCode() {
-        return getId();
+        return Objects.hash(SpellAbility.class, getId());
     }
     @Override
     public boolean equals(final Object obj) {
@@ -552,23 +554,32 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
         return sa;
     }
 
-    public Map<String, Object> getTriggeringObjects() {
+    public Map<AbilityKey, Object> getTriggeringObjects() {
         return triggeringObjects;
     }
-    public void setTriggeringObjects(final Map<String, Object> triggeredObjects) {
-        triggeringObjects = Maps.newHashMap(triggeredObjects);
+    public void setTriggeringObjects(final Map<AbilityKey, Object> triggeredObjects) {
+        triggeringObjects = AbilityKey.newMap(triggeredObjects);
     }
-    public Object getTriggeringObject(final String type) {
+    public Object getTriggeringObject(final AbilityKey type) {
         return triggeringObjects.get(type);
     }
-    public void setTriggeringObject(final String type, final Object o) {
+    public void setTriggeringObject(final AbilityKey type, final Object o) {
         triggeringObjects.put(type, o);
     }
-    public boolean hasTriggeringObject(final String type) {
+    public void setTriggeringObjectsFrom(final Trigger trigger, final AbilityKey... types) {
+        int typesLength = types.length;
+        for (int i = 0; i < typesLength; i += 1) {
+            AbilityKey type = types[i];
+            triggeringObjects.put(type, trigger.getFromRunParams(type));
+        }
+    }
+
+
+    public boolean hasTriggeringObject(final AbilityKey type) {
         return triggeringObjects.containsKey(type);
     }
     public void resetTriggeringObjects() {
-        triggeringObjects = Maps.newHashMap();
+        triggeringObjects = AbilityKey.newMap();
     }
 
     public List<Object> getTriggerRemembered() {
@@ -851,6 +862,12 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
     public void setRightSplit() {
         splitSide = SplitSide.RIGHT;
     }
+    public boolean isAdventure() {
+        return this.adventure;
+    }
+    public void setAdventure(boolean adventure) {
+        this.adventure = adventure;
+    }
 
     public SpellAbility copy() {
         return copy(hostCard, false);
@@ -877,7 +894,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
             clone.originalMapParams = Maps.newHashMap(this.originalMapParams);
             clone.mapParams = Maps.newHashMap(this.mapParams);
 
-            clone.triggeringObjects = Maps.newHashMap(this.triggeringObjects);
+            clone.triggeringObjects = AbilityKey.newMap(this.triggeringObjects);
 
             if (getPayCosts() != null) {
                 clone.setPayCosts(getPayCosts().copy());

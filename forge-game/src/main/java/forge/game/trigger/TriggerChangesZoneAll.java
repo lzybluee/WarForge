@@ -3,6 +3,7 @@ package forge.game.trigger;
 import java.util.List;
 import java.util.Map;
 
+import forge.game.ability.AbilityKey;
 import forge.game.card.*;
 import forge.game.spellability.SpellAbility;
 import forge.game.zone.ZoneType;
@@ -22,18 +23,18 @@ public class TriggerChangesZoneAll extends Trigger {
 
     @Override
     public void setTriggeringObjects(SpellAbility sa) {
-        final CardZoneTable table = (CardZoneTable) getRunParams().get("Cards");
+        final CardZoneTable table = (CardZoneTable) getFromRunParams(AbilityKey.Cards);
 
         CardCollection allCards = this.filterCards(table);
 
-        sa.setTriggeringObject("Cards", allCards);
-        sa.setTriggeringObject("Amount", allCards.size());
+        sa.setTriggeringObject(AbilityKey.Cards, allCards);
+        sa.setTriggeringObject(AbilityKey.Amount, allCards.size());
     }
 
     @Override
     public String getImportantStackObjects(SpellAbility sa) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Amount: ").append(sa.getTriggeringObject("Amount"));
+        sb.append("Amount: ").append(sa.getTriggeringObject(AbilityKey.Amount));
         return sb.toString();
     }
 

@@ -35,6 +35,7 @@ import forge.game.GameEntity;
 import forge.game.GameEntityCounterTable;
 import forge.game.GameLogEntryType;
 import forge.game.ability.AbilityFactory;
+import forge.game.ability.AbilityKey;
 import forge.game.ability.AbilityUtils;
 import forge.game.ability.ApiType;
 import forge.game.card.CardPredicates.Presets;
@@ -917,6 +918,10 @@ public class CardFactoryUtil {
             return doXMath(cc.getSurveilThisTurn(), m, c);
         }
 
+        if (sq[0].equals("YouCastThisGame")) {
+            return doXMath(cc.getSpellsCastThisGame(), m, c);
+        }
+
         if (sq[0].equals("FirstSpellTotalManaSpent")) {
             try{
                 return doXMath(c.getFirstSpellAbility().getTotalManaSpent(), m, c);
@@ -948,7 +953,7 @@ public class CardFactoryUtil {
         
         // TriggeringObjects
         if (sq[0].startsWith("Triggered")) {
-            return doXMath(xCount((Card) c.getTriggeringObject("Card"), sq[0].substring(9)), m, c);
+            return doXMath(xCount((Card) c.getTriggeringObject(AbilityKey.Card), sq[0].substring(9)), m, c);
         }
 
         if (sq[0].contains("YourStartingLife")) {
@@ -1102,13 +1107,11 @@ public class CardFactoryUtil {
             final String restriction = l[0].substring(11);
             final String[] rest = restriction.split(",");
             final CardCollection list = CardLists.getValidCards(cc.getGame().getCardsInGame(), rest, cc, c, null);
-            int n = 0;
-            for (final byte col : MagicColor.WUBRG) {
-                if (!CardLists.getColor(list, col).isEmpty()) {
-                    n++;
-                }
+            byte n = 0;
+            for (final Card card : list) {
+                n |= card.determineColor().getColor();
             }
-            return doXMath(n, m, c);
+            return doXMath(ColorSet.fromMask(n).countColors(), m, c);
         }
 
         if (sq[0].contains("CreatureType")) {
@@ -1329,6 +1332,13 @@ public class CardFactoryUtil {
         // Count$AttackersDeclared
         if (sq[0].contains("AttackersDeclared")) {
             return doXMath(cc.getAttackersDeclaredThisTurn(), m, c);
+        }
+
+        // Count$CardAttackedThisTurn_<Valid>
+        if (sq[0].contains("CreaturesAttackedThisTurn")) {
+            final String[] workingCopy = l[0].split("_");
+            final String validFilter = workingCopy[1];
+            return doXMath(CardLists.getType(cc.getCreaturesAttackedThisTurn(), validFilter).size(), m, c);
         }
 
         // Count$ThisTurnCast <Valid>
@@ -4727,5 +4737,31 @@ public class CardFactoryUtil {
             orClauses.add(sbShort.toString());
         }
         return byClause + StringUtils.join(orClauses, " or ") + ".";
+    }
+
+    public static void setupAdventureAbility(Card card) {
+        if (card.getCurrentStateName() != CardStateName.Adventure) {
+            return;
+        }
+        SpellAbility sa = card.getFirstSpellAbility();
+        if (sa == null) {
+            return;
+        }
+        sa.setAdventure(true);
+
+        String abExile = "DB$ ChangeZone | Defined$ Self | Origin$ Stack | Destination$ Exile | StackDescription$ None";
+
+        AbilitySub saExile = (AbilitySub)AbilityFactory.getAbility(abExile, card);
+
+        String abEffect = "DB$ Effect | RememberObjects$ Self | StaticAbilities$ Play | ExileOnMoved$ Exile | Duration$ Permanent | ConditionDefined$ Self | ConditionPresent$ Card.nonCopiedSpell";
+        AbilitySub saEffect = (AbilitySub)AbilityFactory.getAbility(abEffect, card);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Mode$ Continuous | MayPlay$ True | EffectZone$ Command | Affected$ Card.IsRemembered+nonAdventure");
+        sb.append(" | AffectedZone$ Exile | Description$ You may cast the card.");
+        saEffect.setSVar("Play", sb.toString());
+
+        saExile.setSubAbility(saEffect);
+        sa.appendSubAbility(saExile);
     }
 }

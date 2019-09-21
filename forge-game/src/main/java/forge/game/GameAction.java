@@ -54,6 +54,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.*;
 
+import static forge.util.EnumMapUtil.toStringMap;
+
 /**
  * Methods for common actions performed during a game.
  * 
@@ -144,6 +146,10 @@ public class GameAction {
             }
         }
 
+        // if an adventureCard is put from Stack somewhere else, need to reset to Original State
+        if (c.isAdventureCard() && (zoneFrom.is(ZoneType.Stack) || !zoneTo.is(ZoneType.Stack))) {
+            c.setState(CardStateName.Original, true);
+        }
 
         // Clean up the temporary Dash SVar when the Dashed card leaves the battlefield
         // Clean up the temporary AtEOT SVar
@@ -297,7 +303,7 @@ public class GameAction {
                 repParams.putAll(params);
             }
 
-            ReplacementResult repres = game.getReplacementHandler().run(EnumMapUtil.toStringMap(repParams));
+            ReplacementResult repres = game.getReplacementHandler().run(toStringMap(repParams));
             if (repres != ReplacementResult.NotReplaced) {
                 // reset failed manifested Cards back to original
                 if (c.isManifested()) {
@@ -400,8 +406,7 @@ public class GameAction {
         // play the change zone sound
         game.fireEvent(new GameEventCardChangeZone(c, zoneFrom, zoneTo));
 
-        final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
-        runParams.put(AbilityKey.Card, lastKnownInfo);
+        final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(lastKnownInfo);
         runParams.put(AbilityKey.Cause, cause);
         runParams.put(AbilityKey.Origin, zoneFrom != null ? zoneFrom.getZoneType().name() : null);
         runParams.put(AbilityKey.Destination, zoneTo.getZoneType().name());
@@ -414,8 +419,7 @@ public class GameAction {
 
         game.getTriggerHandler().runTrigger(TriggerType.ChangesZone, runParams, true);
         if (zoneFrom != null && zoneFrom.is(ZoneType.Battlefield) && !zoneFrom.getPlayer().equals(zoneTo.getPlayer())) {
-            final Map<AbilityKey, Object> runParams2 = AbilityKey.newMap();
-            runParams2.put(AbilityKey.Card, lastKnownInfo);
+            final Map<AbilityKey, Object> runParams2 = AbilityKey.mapFromCard(lastKnownInfo);
             runParams2.put(AbilityKey.OriginalController, zoneFrom.getPlayer());
             if(params != null) {
                 runParams2.putAll(params);
@@ -600,8 +604,7 @@ public class GameAction {
         c.setTurnInZone(tiz);
         c.setCameUnderControlSinceLastUpkeep(true);
 
-        final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
-        runParams.put(AbilityKey.Card, c);
+        final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(c);
         runParams.put(AbilityKey.OriginalController, original);
         game.getTriggerHandler().runTrigger(TriggerType.ChangesController, runParams, false);
 
@@ -699,8 +702,7 @@ public class GameAction {
         final Card copied = moveTo(removed, c, cause, params);
 
         // Run triggers
-        final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
-        runParams.put(AbilityKey.Card, c);
+        final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(c);
         runParams.put(AbilityKey.Cause, cause);
         runParams.put(AbilityKey.Origin, origin.getZoneType().name());
         if (params != null) {
@@ -785,14 +787,14 @@ public class GameAction {
                     if (stAb.isTemporary()) {
                         toRemove.add(stAb);
                     }
-                }
-                for (StaticAbility stAb : toRemove) {
-                	co.removeStaticAbility(stAb);
-                }
-                if (!co.getStaticCommandList().isEmpty()) {
-                	staticList.add(co);
-            	}
-                return true;
+                 }
+                 for (StaticAbility stAb : toRemove) {
+                     co.removeStaticAbility(stAb);
+                 }
+                 if (!co.getStaticCommandList().isEmpty()) {
+                     staticList.add(co);
+                 }
+                 return true;
             }
         });
 
@@ -894,10 +896,10 @@ public class GameAction {
         // preList means that this is run by a pre Check with LKI objects
         // in that case Always trigger should not Run
         if (preList.isEmpty()) {
-            final Map<String, Object> runParams = Maps.newHashMap();
-            game.getTriggerHandler().runTriggerOld(TriggerType.Always, runParams, false);
+            final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
+            game.getTriggerHandler().runTrigger(TriggerType.Always, runParams, false);
 
-            game.getTriggerHandler().runTriggerOld(TriggerType.Immediate, runParams, false);
+            game.getTriggerHandler().runTrigger(TriggerType.Immediate, runParams, false);
         }
 
         // Update P/T and type in the view only once after all the cards have been processed, to avoid flickering
@@ -1425,10 +1427,9 @@ public class GameAction {
         game.fireEvent(new GameEventCardDestroyed());
 
         // Run triggers
-        final Map<String, Object> runParams = Maps.newHashMap();
-        runParams.put("Card", c);
-        runParams.put("Causer", activator);
-        game.getTriggerHandler().runTriggerOld(TriggerType.Destroyed, runParams, false);
+        final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(c);
+        runParams.put(AbilityKey.Causer, activator);
+        game.getTriggerHandler().runTrigger(TriggerType.Destroyed, runParams, false);
 
         final Card sacrificed = sacrificeDestroy(c, sa, table);
         return sacrificed != null;
@@ -1605,8 +1606,7 @@ public class GameAction {
             checkStateEffects(true); // why?
 
             // Run Trigger beginning of the game
-            final Map<String, Object> runParams = Maps.newHashMap();
-            game.getTriggerHandler().runTriggerOld(TriggerType.NewGame, runParams, true);
+            game.getTriggerHandler().runTrigger(TriggerType.NewGame, AbilityKey.newMap(), true);
             //</THIS CODE WILL WORK WITH PHASE = NULL>
 
 
@@ -1769,9 +1769,9 @@ public class GameAction {
         game.setMonarch(p);
 
         // Run triggers
-        final Map<String, Object> runParams = Maps.newHashMap();
-        runParams.put("Player", p);
-        game.getTriggerHandler().runTriggerOld(TriggerType.BecomeMonarch, runParams, false);
+        final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
+        runParams.put(AbilityKey.Player, p);
+        game.getTriggerHandler().runTrigger(TriggerType.BecomeMonarch, runParams, false);
     }
 
     // Make scry an action function so that it can be used for mulligans (with a null cause)
@@ -1831,9 +1831,9 @@ public class GameAction {
 
             if (cause != null) {
                 // set up triggers (but not actually do them until later)
-                final Map<String, Object> runParams = Maps.newHashMap();
-                runParams.put("Player", p);
-                game.getTriggerHandler().runTriggerOld(TriggerType.Scry, runParams, false);
+                final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
+                runParams.put(AbilityKey.Player, p);
+                game.getTriggerHandler().runTrigger(TriggerType.Scry, runParams, false);
             }
         }
     }

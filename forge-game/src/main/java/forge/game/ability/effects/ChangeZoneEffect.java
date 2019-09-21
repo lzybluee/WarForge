@@ -4,7 +4,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import forge.GameCommand;
 import forge.card.CardStateName;
 import forge.game.Game;
@@ -831,10 +830,10 @@ public class ChangeZoneEffect extends SpellAbilityEffect {
                     }
                 }
             }
-            final Map<String, Object> runParams = Maps.newHashMap();
-            runParams.put("Player", decider);
-            runParams.put("Target", Lists.newArrayList(player));
-            decider.getGame().getTriggerHandler().runTriggerOld(TriggerType.SearchedLibrary, runParams, false);
+            final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
+            runParams.put(AbilityKey.Player, decider);
+            runParams.put(AbilityKey.Target, Lists.newArrayList(player));
+            decider.getGame().getTriggerHandler().runTrigger(TriggerType.SearchedLibrary, runParams, false);
         }
 
         if (!defined && changeType != null) {
@@ -981,7 +980,10 @@ public class ChangeZoneEffect extends SpellAbilityEffect {
                     } 
                     c.setController(newController, game.getNextTimestamp());
                 }
-
+                if (sa.hasParam("WithCounters")) {
+                    String[] parse = sa.getParam("WithCounters").split("_");
+                    c.addEtbCounter(CounterType.getType(parse[0]), Integer.parseInt(parse[1]), player);
+                }
                 if (sa.hasParam("Transformed")) {
                     if (c.isDoubleFaced()) {
                         c.changeCardState("Transform", null);
@@ -1132,10 +1134,9 @@ public class ChangeZoneEffect extends SpellAbilityEffect {
             }
 
             if (champion) {
-                final Map<String, Object> runParams = Maps.newHashMap();
-                runParams.put("Card", source);
-                runParams.put("Championed", c);
-                game.getTriggerHandler().runTriggerOld(TriggerType.Championed, runParams, false);
+                final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(source);
+                runParams.put(AbilityKey.Championed, c);
+                game.getTriggerHandler().runTrigger(TriggerType.Championed, runParams, false);
             }
             
             if (remember) {
