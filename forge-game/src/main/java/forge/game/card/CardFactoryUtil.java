@@ -1334,6 +1334,10 @@ public class CardFactoryUtil {
             return doXMath(cc.getAttackersDeclaredThisTurn(), m, c);
         }
 
+        if (sq[0].contains("AttackersActivePlayerDeclared") && game.getPhaseHandler().getPlayerTurn() != null) {
+            return doXMath(game.getPhaseHandler().getPlayerTurn().getAttackersDeclaredThisTurn(), m, c);
+        }
+
         // Count$CardAttackedThisTurn_<Valid>
         if (sq[0].contains("CreaturesAttackedThisTurn")) {
             final String[] workingCopy = l[0].split("_");

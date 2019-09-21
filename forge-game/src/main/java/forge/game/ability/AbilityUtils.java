@@ -435,6 +435,18 @@ public class AbilityUtils {
                 players.addAll(game.getPlayers());
                 val = CardFactoryUtil.playerXCount(players, calcX[1], card);
             }
+            if (hType.equals("HasPermanentPlayers")) {
+                for(Player p : game.getPlayers()) {
+                	CardCollectionView cards = p.getCardsIn(ZoneType.Battlefield);
+                	for(Card c : cards) {
+                		if(c.isPermanent() && c.canBeTargetedBy(((SpellAbility)ability))) {
+                			players.add(p);
+                			break;
+                		}
+                	}
+                }
+                val = CardFactoryUtil.playerXCount(players, calcX[1], card);
+            }
             else if (hType.equals("YourTeam")) {
                 players.addAll(player.getYourTeam());
                 val = CardFactoryUtil.playerXCount(players, calcX[1], card);

@@ -146,6 +146,7 @@ public class Card extends GameEntity implements Comparable<Card> {
     private Map<Card, Integer> dealtDamageToThisTurn = Maps.newTreeMap();
     private Map<String, Integer> dealtDamageToPlayerThisTurn = Maps.newTreeMap();
     private final Map<Card, Integer> assignedDamageMap = Maps.newTreeMap();
+    private boolean dealtDamageThisGame = false;
 
     private boolean isCommander = false;
     private boolean startsGameInPlay = false;
@@ -4577,6 +4578,9 @@ public class Card extends GameEntity implements Comparable<Card> {
     }
     public final void addDealtDamageToThisTurn(final Card c, final int damage) {
         int currentDamage = 0;
+        if(damage > 0) {
+        	dealtDamageThisGame = true;
+        }
         if (dealtDamageToThisTurn.containsKey(c)) {
             currentDamage = dealtDamageToThisTurn.get(c);
         }
@@ -4594,6 +4598,9 @@ public class Card extends GameEntity implements Comparable<Card> {
     }
     public final void addDealtDamageToPlayerThisTurn(final String player, final int damage) {
         int currentDamage = 0;
+        if(damage > 0) {
+        	dealtDamageThisGame = true;
+        }
         if (dealtDamageToPlayerThisTurn.containsKey(player)) {
             currentDamage = dealtDamageToPlayerThisTurn.get(player);
         }
@@ -4602,7 +4609,9 @@ public class Card extends GameEntity implements Comparable<Card> {
     public final void resetDealtDamageToPlayerThisTurn() {
         dealtDamageToPlayerThisTurn.clear();
     }
-
+    public final boolean dealtDamageThisGame() {
+    	return dealtDamageThisGame;
+    }
     public final boolean hasDealtDamageToOpponentThisTurn() {
         for (final GameEntity e : getDamageHistory().getThisTurnDamaged()) {
         	if (e instanceof Player) {
