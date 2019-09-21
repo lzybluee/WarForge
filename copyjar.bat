@@ -1,4 +1,4 @@
-del /Q forge
+rd /S /Q forge
 mkdir forge
 xcopy /E /Y forge-ai\target\classes\forge forge
 xcopy /E /Y forge-core\target\classes\forge forge
