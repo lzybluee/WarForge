@@ -1068,6 +1068,8 @@ public class GameAction {
         } // for q=0;q<9
 
         game.getTracker().unfreeze();
+        
+        game.copyLastState();
 
         for (final Card c : game.getCardsIn(ZoneType.Battlefield)) {
         	c.updateController();

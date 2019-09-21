@@ -335,6 +335,10 @@ public class AbilityManaPart implements java.io.Serializable {
                 }
             }
 
+            if (sa.isAbility() && restriction.startsWith("Activated") && sa.isTrigger()) {
+            	continue;
+            }
+
             if (sa.isValid(restriction, this.getSourceCard().getController(), this.getSourceCard(), null)) {
                 return true;
             }

@@ -637,10 +637,6 @@ public class TriggerHandler {
             sa.setActivatingPlayer(p);
         }
 
-        if (triggerParams.containsKey("RememberController")) {
-            host.addRemembered(sa.getActivatingPlayer());
-        }
-
         if (regtrig.isIntrinsic() && regtrig.getOverridingAbility() == null) {
             sa.setIntrinsic(true);
             sa.changeText();
@@ -652,6 +648,14 @@ public class TriggerHandler {
                 // 603.3c If no mode is chosen, the ability is removed from the stack.
                 return;
             }
+        }
+
+        if(!sa.getConditions().areMet(sa)) {
+        	return;
+        }
+
+        if (triggerParams.containsKey("RememberController")) {
+            host.addRemembered(sa.getActivatingPlayer());
         }
 
         Player decider = null;
