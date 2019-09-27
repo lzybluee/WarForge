@@ -366,11 +366,16 @@ public class PhaseHandler implements java.io.Serializable {
                     int numDiscard = playerTurn.isUnlimitedHandSize() || handSize <= max || handSize == 0 ? 0 : handSize - max;
 
                     if (numDiscard > 0) {
+                    	CardCollection discarded = new CardCollection();
                         final CardZoneTable table = new CardZoneTable();
                         for (Card c : playerTurn.getController().chooseCardsToDiscardToMaximumHandSize(numDiscard)){
                             playerTurn.discard(c, null, table);
+                            discarded.add(c);
                         }
                         table.triggerChangesZoneAll(game);
+                        if(discarded.size() > 0) {
+                            game.getAction().reveal(discarded, playerTurn, true);
+                        }
                     }
 
                     // Rule 514.2
