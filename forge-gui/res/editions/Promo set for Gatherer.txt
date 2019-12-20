@@ -117,6 +117,7 @@ S Celestial Archon
 S Celestial Colonnade
 S Celestial Purge
 S Cenn's Tactician
+S Chalice of the Void
 S Chandra Nalaar
 S Chandra's Phoenix
 S Chandra's Regulator
@@ -497,6 +498,7 @@ S Mirran Crusader
 S Mitotic Slime
 S Mizzium Meddler
 S Mogg Fanatic
+S Monastery Mentor
 S Mondronen Shaman
 S Moonsilver Spear
 S Mortify
@@ -657,6 +659,7 @@ S Reciprocate
 S Reckless Wurm
 S Reclamation Sage
 S Recollect
+S Reflecting Pool
 S Relic Seeker
 S Reliquary Tower
 S Reliquary Tower
