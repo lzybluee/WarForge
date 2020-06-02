@@ -764,7 +764,7 @@ public class GameAction {
         game.getReplacementHandler().cleanUpTemporaryReplacements();
 
         for (final Player p : game.getPlayers()) {
-            if (!game.getStack().isFrozen()) {
+            if (!game.getStack().isFrozen() && game.costPaymentStack.peek() == null) {
                 p.getManaPool().restoreColorReplacements();
             }
             p.clearStaticAbilities();
