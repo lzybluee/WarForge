@@ -25,6 +25,7 @@ import forge.card.CardDb;
 import forge.item.IPaperCard;
 import forge.item.PaperCard;
 
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -222,6 +223,7 @@ public class Deck extends DeckBase implements Iterable<Entry<DeckSection, CardPo
         }
 
         boolean hasExplicitlySpecifiedSet = false;
+        boolean hasUnsupported = false;
         for (Entry<String, List<String>> s : deferredSections.entrySet()) {
             DeckSection sec = DeckSection.smartValueOf(s.getKey());
             if (sec == null) {
@@ -234,6 +236,9 @@ public class Deck extends DeckBase implements Iterable<Entry<DeckSection, CardPo
                     hasExplicitlySpecifiedSet = true;
 
             CardPool pool = CardPool.fromCardList(cardsInSection);
+            if(pool.hasUnsupported()) {
+            	hasUnsupported = true;
+            }
             // I used to store planes and schemes under sideboard header, so this will assign them to a correct section
             IPaperCard sample = pool.get(0);
             if (sample != null && ( sample.getRules().getType().isPlane() || sample.getRules().getType().isPhenomenon())) {
@@ -243,6 +248,18 @@ public class Deck extends DeckBase implements Iterable<Entry<DeckSection, CardPo
                 sec = DeckSection.Schemes;
             }
             putSection(sec, pool);
+        }
+
+        if(hasUnsupported) {
+        	System.err.println("Deck not support! " + getPath());
+        	String tag = "userDir" + File.separator + "decks";
+            if(getPath() != null && getPath().contains(tag)) {
+            	File check = new File(getPath().substring(0, getPath().indexOf(tag)) + tag +  File.separator + "delete");
+            	if(check.exists()) {
+                	File del = new File(getPath());
+                	del.delete();
+            	}
+        	}
         }
 
         deferredSections = null;
