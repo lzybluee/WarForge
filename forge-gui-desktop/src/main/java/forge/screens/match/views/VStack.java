@@ -198,34 +198,16 @@ public class VStack implements IVDoc<CStack> {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(final MouseEvent e) {
-                	if (controller.getMatchUI().getCDock().getArcState() == ArcState.MOUSEOVER)	{
-                		hoveredItem = StackInstanceTextArea.this;
-                	}
+                	hoveredItem = StackInstanceTextArea.this;
                 	controller.getMatchUI().setCard(item.getSourceCard());
 
                 }
 
                 @Override
                 public void mouseExited(final MouseEvent e) {
-                	if (controller.getMatchUI().getCDock().getArcState() == ArcState.MOUSEOVER)	{
-                		if (hoveredItem == StackInstanceTextArea.this) {
-                			hoveredItem = null;
-                		}
-                	}
-                }
-                
-                @Override
-                public void mouseClicked(final MouseEvent e) {
-                	if (controller.getMatchUI().getCDock().getArcState() == ArcState.ON) {
-                		if (hoveredItem == StackInstanceTextArea.this) {
-                			hoveredItem = null;
-                		}
-                		else
-                		{
-                			hoveredItem = StackInstanceTextArea.this;
-                			controller.getMatchUI().setCard(item.getSourceCard());
-                		}
-                	}
+            		if (hoveredItem == StackInstanceTextArea.this) {
+            			hoveredItem = null;
+            		}
                 }
             });
 
