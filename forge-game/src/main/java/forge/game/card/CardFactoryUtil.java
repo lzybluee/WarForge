@@ -4033,8 +4033,6 @@ public class CardFactoryUtil {
             inst.addSpellAbility(sa);
         } else if (keyword.startsWith("Fuse") && card.getCurrentStateName().equals(CardStateName.Original)) {
             final SpellAbility sa = AbilityFactory.buildFusedAbility(card);
-            card.addSpellAbility(sa);
-
             sa.setTemporary(!intrinsic);
             inst.addSpellAbility(sa);
         } else if (keyword.startsWith("Haunt")) {            

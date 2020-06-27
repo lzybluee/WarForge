@@ -70,7 +70,14 @@ public class FloatingZone extends FloatingCardArea {
         return cardArea;
     }
     public static CardPanel getCardPanel(final CMatchUI matchUI, final CardView card) {
-        final FloatingZone window = _init(matchUI, card.getController(), card.getZone());
+        FloatingZone window = _init(matchUI, card.getController(), ZoneType.Flashback);
+        CardPanel cardPanel = window.getCardPanel(card.getId());
+        if(cardPanel == null) {
+            window = _init(matchUI, card.getController(), card.getZone());
+            cardPanel = window.getCardPanel(card.getId());
+        } else {
+            cardPanel.setInFlashbackZone(true);
+        }
         return window.getCardPanel(card.getId());
     }
     public static void refresh(final PlayerView player, final ZoneType zone) {

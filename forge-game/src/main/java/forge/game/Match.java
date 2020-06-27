@@ -283,16 +283,16 @@ public class Match {
                 Collection<? extends PaperCard> cardsComplained = player.getController().complainCardsCantPlayWell(myDeck);
                 if (null != cardsComplained) {
                     rAICards.putAll(player, cardsComplained);
+                    for(PaperCard card : cardsComplained) {
+                        System.out.println(card.getName());
+                    }
                 }
+                System.out.println("AI can't play these cards well");
             }
 
             if (myRemovedAnteCards != null && !myRemovedAnteCards.isEmpty()) {
                 removedAnteCards.putAll(player, myRemovedAnteCards);
             }
-        }
-
-        if (!rAICards.isEmpty() && !rules.getGameType().isCardPoolLimited()) {
-            game.getAction().revealAnte("AI can't play these cards well", rAICards);
         }
 
         if (!removedAnteCards.isEmpty()) {

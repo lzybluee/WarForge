@@ -27,6 +27,8 @@ import forge.util.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
@@ -205,6 +207,19 @@ public class GuiDesktop implements IGuiBase {
     @Override
     public String showFileDialog(final String title, final String defaultDir) {
         final JFileChooser fc = new JFileChooser(defaultDir);
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "State File";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getName().toLowerCase().endsWith(".txt");
+            }
+        });
         final int rc = fc.showDialog(null, title);
         if (rc != JFileChooser.APPROVE_OPTION) {
             return null;
@@ -220,6 +235,19 @@ public class GuiDesktop implements IGuiBase {
     @Override
     public File getSaveFile(final File defaultFile) {
         final JFileChooser fc = new JFileChooser();
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "State File";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getName().toLowerCase().endsWith(".txt");
+            }
+        });
         fc.setSelectedFile(defaultFile);
         int result = fc.showSaveDialog(null);
         return result == JFileChooser.APPROVE_OPTION ? fc.getSelectedFile() : null;
