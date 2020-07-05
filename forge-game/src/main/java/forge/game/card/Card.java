@@ -5081,7 +5081,6 @@ public class Card extends GameEntity implements Comparable<Card> {
 
     protected void resetExtertedThisTurn() {
         exertThisTurn = 0;
-        view.updateExertedThisTurn(this, false);
     }
 
     public boolean isMadness() {
@@ -5148,6 +5147,9 @@ public class Card extends GameEntity implements Comparable<Card> {
         removeChangedCardKeywords(bestowTimestamp, updateView);
         removeChangedCardTypes(bestowTimestamp, updateView);
         bestowTimestamp = -1;
+        if(updateView) {
+            game.fireEvent(new GameEventCardStatsChanged(this));
+        }
     }
 
     public final boolean isBestowed() {

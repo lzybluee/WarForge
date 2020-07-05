@@ -68,7 +68,7 @@ public final class CardDb implements ICardDatabase, IDeckGenPool {
 
         public boolean accept(CardEdition ed) {
             if (ed == null)  return false;
-            return !filterSets || ed.getType() == Type.CORE || ed.getType() == Type.EXPANSION || ed.getType() == Type.REPRINT;
+            return !filterSets || ed.getType() == Type.CORE || ed.getType() == Type.EXPANSION;
         }
     }
 
@@ -173,7 +173,7 @@ public final class CardDb implements ICardDatabase, IDeckGenPool {
 
         for (CardEdition e : editions.getOrderedEditions()) {
             boolean coreOrExpSet = e.getType() == CardEdition.Type.CORE || e.getType() == CardEdition.Type.EXPANSION;
-            boolean isCoreExpSet = coreOrExpSet || e.getType() == CardEdition.Type.REPRINT;
+            boolean isCoreExpSet = coreOrExpSet;
             if (logMissingPerEdition && isCoreExpSet) {
                 System.out.print(e.getName() + " (" + e.getCards().length + " cards)");
             }

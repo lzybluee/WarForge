@@ -1613,6 +1613,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
 
     // stores saved order for different sets of SpellAbilities
     private final Map<String, List<Integer>> orderedSALookup = Maps.newHashMap();
+    private final Map<String, Long> orderedSALookupTimestamp = Maps.newHashMap();
 
     @Override
     public void orderAndPlaySimultaneousSa(final List<SpellAbility> activePlayerSAs) {
@@ -1669,7 +1670,14 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
                             preselect ? orderedSAVs : Lists.newArrayList(), null, false);
                 } else {
                 	String refereceKey = null;
-                    for (String key : orderedSALookup.keySet()) {
+                	List<String> toSort = Lists.newArrayList(orderedSALookup.keySet());
+                    Collections.sort(toSort, new Comparator<String>() {
+                        @Override
+                        public int compare(String s1, String s2) {
+                            return (int) (orderedSALookupTimestamp.get(s2) - orderedSALookupTimestamp.get(s1));
+                        }
+                    });
+                    for (String key : toSort) {
                         boolean found = true;
                         for (String s : key.split(delim + "")) {
                             if (!saLookupKey.toString().contains(s)) {
@@ -1718,6 +1726,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
                     savedOrder.add(activePlayerSAs.indexOf(sa));
                 }
                 orderedSALookup.put(saLookupKey.toString(), savedOrder);
+                orderedSALookupTimestamp.put(saLookupKey.toString(), game.getTimestamp());
             }
         }
         for (int i = orderedSAs.size() - 1; i >= 0; i--) {
@@ -2172,8 +2181,8 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
          * @see forge.player.IDevModeCheats#addCountersToPermanent()
          */
         @Override
-        public void addCountersToPermanent() {
-            modifyCountersOnPermanent(false);
+        public void addCountersToPermanent(boolean player) {
+            modifyCountersOnPermanent(false, player);
         }
 
         /*
@@ -2182,38 +2191,59 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
          * @see forge.player.IDevModeCheats#removeCountersToPermanent()
          */
         @Override
-        public void removeCountersFromPermanent() {
-            modifyCountersOnPermanent(true);
+        public void removeCountersFromPermanent(boolean player) {
+            modifyCountersOnPermanent(true, player);
         }
 
-        public void modifyCountersOnPermanent(boolean subtract) {
-            final String titleMsg = subtract ? "Remove counters from which card?" : "Add counters to which card?";
-            final CardCollectionView cards = game.getCardsIn(ZoneType.Battlefield);
-            final Card card = game
-                    .getCard(getGui().oneOrNone(titleMsg, CardView.getCollection(cards)));
-            if (card == null) {
-                return;
-            }
+        public void modifyCountersOnPermanent(boolean subtract, boolean player) {
+        	if(player) {
+        		final String titleMsg = subtract ? "Remove counters from which player?" : "Add counters to which player?";
+                final Player p = game.getPlayer(getGui().oneOrNone(titleMsg, PlayerView.getCollection(game.getPlayers())));
+                final CounterType counter = getGui().oneOrNone("Which type of counter?",
+                        Lists.newArrayList(CounterType.ENERGY, CounterType.EXPERIENCE, CounterType.POISON));
+                if (counter == null) {
+                    return;
+                }
 
-            final ImmutableList<CounterType> counters = subtract ? ImmutableList.copyOf(card.getCounters().keySet())
-                : CounterType.values;
+                final Integer count = getGui().getInteger("How many counters?", 1, Integer.MAX_VALUE, 21);
+                if (count == null) {
+                    return;
+                }
 
-            final CounterType counter = getGui().oneOrNone("Which type of counter?", counters);
-            if (counter == null) {
-                return;
-            }
-
-            final Integer count = getGui().getInteger("How many counters?", 1, Integer.MAX_VALUE, 21);
-            if (count == null) {
-                return;
-            }
-
-            if (subtract) {
-                card.subtractCounter(counter, count);
+                GameEntityCounterTable table = new GameEntityCounterTable();
+                if (subtract) {
+                	p.subtractCounter(counter, count);
+                } else {
+                	p.addCounter(counter, count, null, false, table);
+                }
             } else {
-                card.addCounter(counter, count, card.getController(), false, null);
+	            final String titleMsg = subtract ? "Remove counters from which card?" : "Add counters to which card?";
+	            final CardCollectionView cards = game.getCardsIn(ZoneType.Battlefield);
+	            final Card card = game
+	                    .getCard(getGui().oneOrNone(titleMsg, CardView.getCollection(cards)));
+	            if (card == null) {
+	                return;
+	            }
+	
+	            final ImmutableList<CounterType> counters = subtract ? ImmutableList.copyOf(card.getCounters().keySet())
+	                : CounterType.values;
+	
+	            final CounterType counter = getGui().oneOrNone("Which type of counter?", counters);
+	            if (counter == null) {
+	                return;
+	            }
+	
+	            final Integer count = getGui().getInteger("How many counters?", 1, Integer.MAX_VALUE, 21);
+	            if (count == null) {
+	                return;
+	            }
+	
+	            if (subtract) {
+	                card.subtractCounter(counter, count);
+	            } else {
+	                card.addCounter(counter, count, card.getController(), false, null);
+	            }
             }
-
         }
 
         /*

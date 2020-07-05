@@ -208,15 +208,25 @@ public abstract class InputPayMana extends InputSyncronizedBase {
         }
 
         boolean guessAbilityWithRequiredColors = true;
+        SpellAbility priorAbility = null;
         int amountOfMana = -1;
+        
+        boolean hasSpecialEffect = false;
+        boolean canProduceMoreMana = false;
+
         for (SpellAbility ma : card.getManaAbilities()) {
             ma.setActivatingPlayer(player);
 
+            boolean skipManaCheck = false;
+            if(ma.hasParam("ConditionCheckSVar") || ma.hasParam("ReplaceIfLandPlayed")) {
+                skipManaCheck = true;
+            }
+
             AbilityManaPart m = ma.getManaPartRecursive();
-            if (m == null || !ma.canPlay())                                 { continue; }
-            if (!abilityProducesManaColor(ma, m, colorCanUse))              { continue; }
-            if (ma.isAbility() && ma.getRestrictions().isInstantSpeed())    { continue; }
-            if (!m.meetsManaRestrictions(saPaidFor))                        { continue; }
+            if (m == null || !ma.canPlay())                                         { continue; }
+            if (!abilityProducesManaColor(ma, m, colorCanUse) && !skipManaCheck)    { continue; }
+            if (ma.isAbility() && ma.getRestrictions().isInstantSpeed())            { continue; }
+            if (!m.meetsManaRestrictions(saPaidFor))                                { continue; }
 
             // If Mana Abilities produce differing amounts of mana, let the player choose
             int maAmount = GameActionUtil.amountOfManaGenerated(ma, true);
@@ -228,7 +238,19 @@ public abstract class InputPayMana extends InputSyncronizedBase {
                 }
             }
 
+            if(m.getManaRestrictions() != null && !m.getManaRestrictions().isEmpty()) {
+                priorAbility = ma;
+            }
+
             abilitiesMap.put(ma.getView(), ma);
+
+            if(ma.hasParam("Amount") && ma.hasParam("RestrictValid")) {
+                canProduceMoreMana = true;
+            }
+
+            if(ma.hasParam("AddsNoCounter")) {
+                hasSpecialEffect = true;
+            }
 
             // skip express mana if the ability is not undoable or reusable
             if (!ma.isUndoable() || !ma.getPayCosts().isRenewableResource() || ma.getSubAbility() != null) {
@@ -289,17 +311,26 @@ public abstract class InputPayMana extends InputSyncronizedBase {
         }
 
         // Exceptions for cards that have conditional abilities which are better handled manually
-        if (card.getName().equals("Cavern of Souls") && isPayingGeneric) {
+        if (hasSpecialEffect && isPayingGeneric) {
             choice = true;
         }
 
-        final SpellAbility chosen;
+        if (canProduceMoreMana && priorAbility != null) {
+            choice = false;
+        }
+
+        SpellAbility chosen;
         if (chosenAbility == null) {
             ArrayList<SpellAbilityView> choices = new ArrayList<>(abilitiesMap.keySet());
-            if(abilitiesMap.size() > 1 && choice) {
-                chosen = abilitiesMap.get(getController().getGui().getAbilityToPlay(card.getView(), choices, triggerEvent));
-                if(chosen == null) {
-                    return false;
+            if(abilitiesMap.size() > 1) {
+                if(choice) {
+                    chosen = abilitiesMap.get(getController().getGui().one("Choose mana ability",  choices));
+                } else {
+                    if(abilitiesMap.containsValue(priorAbility)) {
+                        chosen = priorAbility;
+                    } else {
+                        chosen = abilitiesMap.get(choices.get(0));
+                    }
                 }
             } else {
                 chosen = abilitiesMap.get(choices.get(0));
