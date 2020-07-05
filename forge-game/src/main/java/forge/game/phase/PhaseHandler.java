@@ -188,6 +188,8 @@ public class PhaseHandler implements java.io.Serializable {
 
             final List<Card> lands = CardLists.filter(playerTurn.getLandsInPlay(), Presets.UNTAPPED);
             playerTurn.setNumPowerSurgeLands(lands.size());
+
+            game.fireEvent(new GameEventZone(ZoneType.Battlefield, playerTurn, EventValueChangeType.ComplexUpdate, null));
         }
 
         game.fireEvent(new GameEventTurnPhase(playerTurn, phase, phaseType));
@@ -1100,6 +1102,7 @@ public class PhaseHandler implements java.io.Serializable {
             if (game.isGameOver()) {
                 return true; // state-based effects check could lead to game over
             }
+            game.getStack().setFrozen(false);
         } while (game.getStack().addAllTriggeredAbilitiesToStack()); //loop so long as something was added to stack
 
         if (!allAffectedCards.isEmpty()) {

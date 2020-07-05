@@ -66,6 +66,7 @@ public class GameAction {
     private final Game game;
 
     private boolean holdCheckingStaticAbilities = false;
+    private boolean isRollback;
 
     public GameAction(Game game0) {
         game = game0;
@@ -291,31 +292,33 @@ public class GameAction {
                 copied.getOwner().addInboundToken(copied);
             }
 
-            Map<AbilityKey, Object> repParams = AbilityKey.newMap();
-            repParams.put(AbilityKey.Event, "Moved");
-            repParams.put(AbilityKey.Affected, copied);
-            repParams.put(AbilityKey.CardLKI, lastKnownInfo);
-            repParams.put(AbilityKey.Cause, cause);
-            repParams.put(AbilityKey.Origin, zoneFrom != null ? zoneFrom.getZoneType() : null);
-            repParams.put(AbilityKey.Destination, zoneTo.getZoneType());
-
-            if (params != null) {
-                repParams.putAll(params);
-            }
-
-            ReplacementResult repres = game.getReplacementHandler().run(toStringMap(repParams));
-            if (repres != ReplacementResult.NotReplaced) {
-                // reset failed manifested Cards back to original
-                if (c.isManifested()) {
-                    c.turnFaceUp(false, false);
-                }
-
-                if (game.getStack().isResolving(c) && !zoneTo.is(ZoneType.Graveyard) && repres == ReplacementResult.Prevented) {
-                    copied.getOwner().removeInboundToken(copied);
-                    return moveToGraveyard(c, cause, params);
-                }
-                copied.getOwner().removeInboundToken(copied);
-                return c;
+            if (!isRollback) {
+	            Map<AbilityKey, Object> repParams = AbilityKey.newMap();
+	            repParams.put(AbilityKey.Event, "Moved");
+	            repParams.put(AbilityKey.Affected, copied);
+	            repParams.put(AbilityKey.CardLKI, lastKnownInfo);
+	            repParams.put(AbilityKey.Cause, cause);
+	            repParams.put(AbilityKey.Origin, zoneFrom != null ? zoneFrom.getZoneType() : null);
+	            repParams.put(AbilityKey.Destination, zoneTo.getZoneType());
+	
+	            if (params != null) {
+	                repParams.putAll(params);
+	            }
+	
+	            ReplacementResult repres = game.getReplacementHandler().run(toStringMap(repParams));
+	            if (repres != ReplacementResult.NotReplaced) {
+	                // reset failed manifested Cards back to original
+	                if (c.isManifested()) {
+	                    c.turnFaceUp(false, false);
+	                }
+	
+	                if (game.getStack().isResolving(c) && !zoneTo.is(ZoneType.Graveyard) && repres == ReplacementResult.Prevented) {
+	                    copied.getOwner().removeInboundToken(copied);
+	                    return moveToGraveyard(c, cause, params);
+	                }
+	                copied.getOwner().removeInboundToken(copied);
+	                return c;
+	            }
             }
         }
 
@@ -480,6 +483,10 @@ public class GameAction {
                     unmeldPosition++;
                 }
                 changeZone(null, zoneTo, unmeld, position, cause, params);
+            }
+            // Remove controlling
+            for (final Card bc : game.getCardsIn(ZoneType.Battlefield)) {
+                bc.removeGainControlTargets(c);
             }
             // Reveal if face-down
             if (wasFacedown) {
@@ -1655,7 +1662,7 @@ public class GameAction {
         }
 
         boolean isFirstGame = lastGameOutcome == null;
-        if (isFirstGame) {
+        if (isFirstGame || lastGameOutcome.getWinCondition() == GameEndReason.Draw) {
             game.fireEvent(new GameEventFlipCoin()); // Play the Flip Coin sound
             goesFirst = Aggregates.random(game.getPlayers());
         } else {
@@ -1670,7 +1677,7 @@ public class GameAction {
         if (goesFirst == null) {
             // This happens in hotseat matches when 2 equal lobbyplayers play.
             // Noone of them has lost, so cannot decide who goes first .
-            goesFirst = game.getPlayers().get(0); // does not really matter who plays first - it's controlled from the same computer.
+            goesFirst = Aggregates.random(game.getPlayers()); // does not really matter who plays first - it's controlled from the same computer.
         }
 
         for (Player p : game.getPlayers()) {
@@ -1838,5 +1845,9 @@ public class GameAction {
                 game.getTriggerHandler().runTrigger(TriggerType.Scry, runParams, false);
             }
         }
+    }
+
+    public void setRollback(boolean rollback) {
+        isRollback = rollback;
     }
 }

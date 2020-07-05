@@ -347,13 +347,22 @@ public class Card extends GameEntity implements Comparable<Card> {
                 }
             }
             else if (isFlipCard() && currentStateName != CardStateName.Flipped) {
-                return CardStateName.Flipped;
+                if(isFaceDown())
+                    return CardStateName.Original;
+                else
+                    return CardStateName.Flipped;
             }
             else if (isDoubleFaced() && currentStateName != CardStateName.Transformed) {
-                return CardStateName.Transformed;
+                if(isFaceDown())
+                    return CardStateName.Original;
+                else
+                    return CardStateName.Transformed;
             }
             else if (isMeldable() && currentStateName != CardStateName.Meld) {
-                return CardStateName.Meld;
+                if(isFaceDown())
+                    return CardStateName.Original;
+                else
+                    return CardStateName.Meld;
             }
             else if (this.isAdventureCard() && currentStateName != CardStateName.Adventure) {
                 return CardStateName.Adventure;
@@ -1289,6 +1298,10 @@ public class Card extends GameEntity implements Comparable<Card> {
                 getGame().fireEvent(new GameEventCardCounters(this, counterType, oldValue == null ? 0 : oldValue, newValue));
             }
 
+            for(Player p : game.getPlayers()) {
+                getGame().fireEvent(new GameEventZone(ZoneType.Battlefield, p, EventValueChangeType.ComplexUpdate, null));
+            }
+
             // Run triggers
             final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(this);
             runParams.put(AbilityKey.Source, source);
@@ -1368,6 +1381,10 @@ public class Card extends GameEntity implements Comparable<Card> {
 
         // Play the Subtract Counter sound
         getGame().fireEvent(new GameEventCardCounters(this, counterName, oldValue, newValue));
+
+        for(Player p : game.getPlayers()) {
+            getGame().fireEvent(new GameEventZone(ZoneType.Battlefield, p, EventValueChangeType.ComplexUpdate, null));
+        }
 
         // Run triggers
         int curCounters = oldValue;

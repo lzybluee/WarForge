@@ -230,6 +230,22 @@ public class PlayerView extends GameEntityView {
         return hasUnlimitedHandSize() ? "unlimited" : String.valueOf(getMaxHandSize());
     }
 
+    public int getLandsPlayedThisTurn() {
+        return get(TrackableProperty.LandsPlayedThisTurn);
+    }
+
+    public void updateLandsPlayedThisTurn(Player p) {
+        set(TrackableProperty.LandsPlayedThisTurn, p.getLandsPlayedThisTurn());
+    }
+
+    public int getSpellsCastThisTurn() {
+        return get(TrackableProperty.SpellsCastThisTurn);
+    }
+
+    public void updateSpellsCastThisTurn(Player p) {
+        set(TrackableProperty.SpellsCastThisTurn, p.getSpellsCastThisTurn());
+    }
+
     public int getNumDrawnThisTurn() {
         return get(TrackableProperty.NumDrawnThisTurn);
     }
@@ -443,13 +459,17 @@ public class PlayerView extends GameEntityView {
         }
 
         details.add(TextUtil.concatNoSpace("Cards in hand: ", TextUtil.addSuffix(String.valueOf(getHandSize()),"/"), getMaxHandString()));
+        details.add(TextUtil.concatNoSpace("Lands played this turn: ", String.valueOf(getLandsPlayedThisTurn())));
+        details.add(TextUtil.concatNoSpace("Spells cast this turn: ", String.valueOf(getSpellsCastThisTurn())));
         details.add(TextUtil.concatWithSpace("Cards drawn this turn:", String.valueOf(getNumDrawnThisTurn())));
         details.add(TextUtil.concatWithSpace("Damage prevention:", String.valueOf(getPreventNextDamage())));
 
         if (getIsExtraTurn()) {
             details.add("Extra Turn: Yes");
         }
-        details.add(TextUtil.concatWithSpace("Extra Turn Count:", String.valueOf(getExtraTurnCount())));
+        if (getExtraTurnCount() > 0) {
+            details.add(TextUtil.concatWithSpace("Extra Turn Count:", String.valueOf(getExtraTurnCount())));
+        }
         final String keywords = Lang.joinHomogenous(getDisplayableKeywords());
         if (!keywords.isEmpty()) {
             details.add(keywords);

@@ -1505,6 +1505,7 @@ public class Player extends GameEntity implements Comparable<Player> {
         cl.addAll(getZone(ZoneType.Graveyard).getCardsPlayerCanActivate(this));
         cl.addAll(getZone(ZoneType.Exile).getCardsPlayerCanActivate(this));
         cl.addAll(getZone(ZoneType.Library).getCardsPlayerCanActivate(this));
+        cl.addAll(getZone(ZoneType.Exile).getCardsSuspended(this));
         if (includeCommandZone) {
             cl.addAll(getZone(ZoneType.Command).getCardsPlayerCanActivate(this));
         }
@@ -2136,9 +2137,11 @@ public class Player extends GameEntity implements Comparable<Player> {
     public final void addLandPlayedThisTurn() {
         landsPlayedThisTurn++;
         achievementTracker.landsPlayed++;
+        view.updateLandsPlayedThisTurn(this);
     }
     public final void resetLandsPlayedThisTurn() {
         landsPlayedThisTurn = 0;
+        view.updateLandsPlayedThisTurn(this);
     }
     public final void setLandsPlayedThisTurn(int num) {
         // This method should only be used directly when setting up the game state.
@@ -2215,9 +2218,11 @@ public class Player extends GameEntity implements Comparable<Player> {
         if (spellsCastThisTurn > achievementTracker.maxStormCount) {
             achievementTracker.maxStormCount = spellsCastThisTurn;
         }
+        view.updateSpellsCastThisTurn(this);
     }
     public final void resetSpellsCastThisTurn() {
         spellsCastThisTurn = 0;
+        view.updateLandsPlayedThisTurn(this);
     }
     public final void setSpellsCastLastTurn(int num) {
         spellsCastLastTurn = num;

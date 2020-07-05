@@ -75,6 +75,16 @@ public abstract class AbstractGuiGame implements IGuiGame, IMayViewCards {
         if (gameView == null || gameView0 == null) {
             if (gameView0 != null) {
                 gameView0.updateObjLookup();
+            } else {
+                autoPassUntilEndOfTurn.clear();
+                autoYields.clear();
+                triggersAlwaysAccept.clear();
+                currentPlayer = null;
+                gameControllers.clear();
+                originalGameControllers.clear();
+                highlightedCards.clear();
+                highlightedPlayers.clear();
+                spectator = null;
             }
             gameView = gameView0;
             return;
@@ -198,6 +208,9 @@ public abstract class AbstractGuiGame implements IGuiGame, IMayViewCards {
         } else {
             highlightedPlayers.remove(pv);
         }
+        Set<PlayerView> p = Sets.newHashSet();
+        p.add(pv);
+        updateLives(p);
     }
 
     public boolean isHighlighted(final PlayerView player) {

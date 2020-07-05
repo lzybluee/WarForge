@@ -52,6 +52,7 @@ public final class GameMenu {
         menu.add(getMenuItem_AutoYields());
         menu.addSeparator();
         menu.add(getMenuItem_ViewDeckList());
+        menu.add(getMenuItem_ViewOpponentDeckList());
         menu.addSeparator();
         menu.add(getMenuItem_GameSoundEffects());
         return menu;
@@ -232,11 +233,27 @@ public final class GameMenu {
         return menuItem;
     }
 
+    private SkinnedMenuItem getMenuItem_ViewOpponentDeckList() {
+        final SkinnedMenuItem menuItem = new SkinnedMenuItem("Opponent Deck List");
+        menuItem.setIcon((showIcons ? MenuUtil.getMenuIcon(FSkinProp.ICO_DECKLIST) : null));
+        menuItem.addActionListener(getViewOpponentDeckListAction());
+        return menuItem;
+    }
+
     private ActionListener getViewDeckListAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 matchUI.viewDeckList();
+            }
+        };
+    }
+
+    private ActionListener getViewOpponentDeckListAction() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                matchUI.viewOpponentDeckList();
             }
         };
     }

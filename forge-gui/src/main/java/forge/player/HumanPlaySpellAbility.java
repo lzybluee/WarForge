@@ -152,12 +152,20 @@ public class HumanPlaySpellAbility {
 
         // This line makes use of short-circuit evaluation of boolean values, that is each subsequent argument
         // is only executed or evaluated if the first argument does not suffice to determine the value of the expression
-        final boolean prerequisitesMet = announceValuesLikeX()
+        boolean prerequisitesMet = announceValuesLikeX()
                 && announceType()
-                && (!mayChooseTargets || setupTargets()) // if you can choose targets, then do choose them.
-                && (isFree || payment.payCost(new HumanCostDecision(controller, human, ability, ability.getHostCard())));
+                && (!mayChooseTargets || setupTargets()); // if you can choose targets, then do choose them.
+
+        boolean payCost = true;
+        if(prerequisitesMet) {
+            payCost = isFree || payment.payCost(new HumanCostDecision(controller, human, ability, ability.getHostCard()));
+            prerequisitesMet = (prerequisitesMet && payCost);
+        }
 
         if (!prerequisitesMet) {
+            if (ability.isTrigger() && !payCost) {
+                payment.refundPayment();
+            }
             if (!ability.isTrigger()) {
                 rollbackAbility(fromZone, fromState, zonePosition, payment);
                 if (ability.getHostCard().isMadness()) {
@@ -250,7 +258,9 @@ public class HumanPlaySpellAbility {
 
         if (fromZone != null) { // and not a copy
             // add back to where it came from
+        	game.getAction().setRollback(true);
             game.getAction().moveTo(fromZone, ability.getHostCard(), zonePosition >= 0 ? Integer.valueOf(zonePosition) : null, null);
+            game.getAction().setRollback(false);
             if(ability.getHostCard().isSplitCard())
                 ability.getHostCard().setState(CardStateName.Original, true);
             else
