@@ -32,5 +32,9 @@ public abstract class CachedCardImage implements ImageFetcher.Callback {
         return ImageCache.getImage(card, viewers, width, height);
     }
 
+    public BufferedImage getFrontImage() {
+        return ImageCache.getImage(card, null, width, height);
+    }
+
     public abstract void onImageFetched();
 }

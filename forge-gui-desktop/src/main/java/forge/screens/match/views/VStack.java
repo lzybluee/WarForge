@@ -65,7 +65,8 @@ public class VStack implements IVDoc<CStack> {
     private final AbilityMenu abilityMenu = new AbilityMenu();
 
     private StackInstanceTextArea hoveredItem;
-
+    private int lastStackSize = 0;
+    
     public StackInstanceTextArea getHoveredItem() {
         return hoveredItem;
     }
@@ -131,9 +132,14 @@ public class VStack implements IVDoc<CStack> {
             //update the Card Picture/Detail when the spell is added to the stack
             if (isFirst) {
                 isFirst = false;
-                controller.getMatchUI().setCard(item.getSourceCard());
+                controller.getMatchUI().setPaperCard(item.getSourceCard());
             }
         }
+
+        if (lastStackSize != items.size()) {
+            controller.getMatchUI().clearPanelSelections();
+        }
+        lastStackSize = items.size();
 
         scroller.revalidate();
         scroller.repaint();
@@ -204,7 +210,7 @@ public class VStack implements IVDoc<CStack> {
                     if (matchUI != null) {
                         matchUI.clearPanelSelections();
                         if (item.getSourceCard() != null) {
-                            matchUI.setCard(item.getSourceCard());
+                            matchUI.setPaperCard(item.getSourceCard());
                             matchUI.setPanelSelection(item.getSourceCard());
                         }
                     }
@@ -261,7 +267,7 @@ public class VStack implements IVDoc<CStack> {
             final Graphics2D g2d = (Graphics2D) g;
 
             //draw image for source card
-            final BufferedImage img = cachedImage.getImage();
+            final BufferedImage img = cachedImage.getFrontImage();
             if (img != null) {
                 g2d.drawImage(img, null, PADDING, PADDING);
             }

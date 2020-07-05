@@ -69,11 +69,11 @@ public class Match {
     }
 
     public void startGame(final Game game) {
-        startGame(game, null);
+        startGame(game, null, null, false);
     }
 
-    public void startGame(final Game game, Runnable startGameHook) {
-        prepareAllZones(game);
+    public void startGame(final Game game, Runnable startGameHook, String startPlayer, boolean skipRestore) {
+        prepareAllZones(game, skipRestore);
         if (rules.useAnte()) {  // Deciding which cards go to ante
             Multimap<Player, Card> list = game.chooseCardsForAnte(rules.getMatchAnteRarity());
             for (Entry<Player, Card> kv : list.entries()) {
@@ -86,7 +86,7 @@ public class Match {
 
         GameOutcome lastOutcome = gamesPlayed.isEmpty() ? null : gamesPlayed.get(gamesPlayed.size() - 1);
 
-        game.getAction().startGame(lastOutcome, startGameHook);
+        game.getAction().startGame(lastOutcome, startGameHook, startPlayer);
 
         if (rules.useAnte()) {
             executeAnte(game);
@@ -201,7 +201,7 @@ public class Match {
         library.setCards(newLibrary);
     }
 
-    private void prepareAllZones(final Game game) {
+    private void prepareAllZones(final Game game, boolean skipRestore) {
         // need this code here, otherwise observables fail
         Trigger.resetIDs();
         game.getTriggerHandler().clearDelayedTrigger();
@@ -233,6 +233,10 @@ public class Match {
         for (int i = 0; i < playersConditions.size(); i++) {
             final Player player = players.get(i);
             final RegisteredPlayer psc = playersConditions.get(i);
+
+            if (!skipRestore && isFirstGame && rules.getGameType().isSideboardingAllowed()) {
+                psc.restoreDeck();
+            }
 
             if (canSideBoard) {
                 PlayerController person = player.getController();

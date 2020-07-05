@@ -113,6 +113,10 @@ public class PlayerView extends GameEntityView {
             opponents = Collections.emptyList();
         }
         for (final PlayerView p : Iterables.concat(Collections.singleton(this), opponents)) {
+            final int cast = p.getCommanderCast(v);
+            if (cast > 0) {
+                sb.append(String.format("Commander cast from commander zone: %d\r\n", cast));
+            }
             final int damage = p.getCommanderDamage(v);
             if (damage > 0) {
                 final String text = TextUtil.concatWithSpace("Commander damage to", p.toString(),"from", TextUtil.addSuffix(v.getName(),":"));
@@ -140,6 +144,10 @@ public class PlayerView extends GameEntityView {
 
         // own commanders
         for (final CardView v : commanders) {
+            final int cast = this.getCommanderCast(v);
+            if (cast > 0) {
+                info.add(String.format("Cast %s from commander zone: %d\r\n", v, cast));
+            }
             final int damage = getCommanderDamage(v);
             if (damage > 0) {
                 final String text = TextUtil.concatWithSpace("Commander damage from own commander", TextUtil.addSuffix(v.toString(),":"));
@@ -276,6 +284,20 @@ public class PlayerView extends GameEntityView {
     }
     void updateCommander(Player p) {
         set(TrackableProperty.Commander, CardView.getCollection(p.getCommanders()));
+    }
+
+    public int getCommanderCast(CardView commander) {
+        Map<Integer, Integer> map = get(TrackableProperty.CommanderCast);
+        if (map == null) { return 0; }
+        Integer cast = map.get(commander.getId());
+        return cast == null ? 0 : cast.intValue();
+    }
+    void updateCommanderCast(Player p) {
+        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for (Entry<Card, Integer> entry : p.getCommanderCast()) {
+            map.put(entry.getKey().getId(), entry.getValue());
+        }
+        set(TrackableProperty.CommanderCast, map);
     }
 
     public int getCommanderDamage(CardView commander) {
@@ -462,7 +484,9 @@ public class PlayerView extends GameEntityView {
         details.add(TextUtil.concatNoSpace("Lands played this turn: ", String.valueOf(getLandsPlayedThisTurn())));
         details.add(TextUtil.concatNoSpace("Spells cast this turn: ", String.valueOf(getSpellsCastThisTurn())));
         details.add(TextUtil.concatWithSpace("Cards drawn this turn:", String.valueOf(getNumDrawnThisTurn())));
-        details.add(TextUtil.concatWithSpace("Damage prevention:", String.valueOf(getPreventNextDamage())));
+        if(getPreventNextDamage() > 0) {
+        	details.add(TextUtil.concatWithSpace("Damage prevention:", String.valueOf(getPreventNextDamage())));
+        }
 
         if (getIsExtraTurn()) {
             details.add("Extra Turn: Yes");

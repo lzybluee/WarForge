@@ -235,7 +235,8 @@ public class HostedMatch {
                     game.subscribeToEvents(playbackControl);
                 }
                 // Actually start the game!
-                match.startGame(game, startGameHook);
+                match.startGame(game, startGameHook, FModel.getPreferences().getPref(FPref.UI_START_PLAYER),
+                		FModel.getPreferences().getPrefBoolean(FPref.UI_SKIP_RESTORE_DECK));
 
                 // After game is over...
                 isMatchOver = match.isMatchOver();

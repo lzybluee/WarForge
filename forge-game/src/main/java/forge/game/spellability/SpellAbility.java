@@ -39,6 +39,7 @@ import forge.game.cost.CostPartMana;
 import forge.game.cost.CostRemoveCounter;
 import forge.game.keyword.Keyword;
 import forge.game.mana.Mana;
+import forge.game.mana.ManaCostBeingPaid;
 import forge.game.player.Player;
 import forge.game.replacement.ReplacementEffect;
 import forge.game.staticability.StaticAbility;
@@ -169,6 +170,9 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
     private CardDamageMap damageMap = null;
     private CardDamageMap preventMap = null;
     private CardZoneTable changeZoneTable = null;
+
+    private ManaCostBeingPaid usedToPayMana = null;
+    private boolean needChooseMana = false;
 
     public CardCollection getLastStateBattlefield() {
         return lastStateBattlefield;
@@ -633,7 +637,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
 
     public String getStackDescription() {
         String text = getHostCard().getView().getText();
-        if (stackDescription.equals(text)) {
+        if (stackDescription.equals(text) && !text.isEmpty()) {
             return getHostCard().getName() + " - " + text;
         }
         return TextUtil.fastReplace(stackDescription, "CARDNAME", getHostCard().getName());
@@ -1541,7 +1545,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
 
     public SpellAbility getParentTargetingCard() {
         SpellAbility parent = getParent();
-        if (parent instanceof WrappedAbility) {
+        if (parent != null && parent instanceof WrappedAbility) {
             parent = ((WrappedAbility) parent).getWrappedAbility();
         }
         while (parent != null) {
@@ -1549,6 +1553,9 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
                 return parent;
             }
             parent = parent.getParent();
+            if (parent != null && parent instanceof WrappedAbility) {
+                parent = ((WrappedAbility) parent).getWrappedAbility();
+            }
         }
         return null;
     }
@@ -1734,7 +1741,7 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
             return true;
         }
         String text = hostCard.getRules().getOracleText();
-        if (isSpell() && text.contains("was spent to cast")) {
+        if (isSpell() && (text.contains("was spent to cast") || text.contains("Converge — "))) {
             return true;
         }
         if (isAbility() && text.contains("mana spent to pay")) {
@@ -1959,5 +1966,21 @@ public abstract class SpellAbility extends CardTraitBase implements ISpellAbilit
 
     public void setGrantorStatic(final StaticAbility st) {
         grantorStatic = st;
+    }
+
+    public void setUsedToPayMana(ManaCostBeingPaid mana) {
+        usedToPayMana = mana;
+    }
+
+    public ManaCostBeingPaid getUsedToPayMana() {
+        return usedToPayMana;
+    }
+
+    public void setNeedChooseMana(boolean b) {
+        needChooseMana = b;
+    }
+
+    public boolean getNeedChooseMana() {
+        return needChooseMana;
     }
 }

@@ -152,6 +152,7 @@ public interface IGuiGame {
     List<CardView> manipulateCardList(String title, final Iterable<CardView> cards, final Iterable<CardView> manipulable, boolean toTop, boolean toBottom, boolean toAnywhere);
 
     void setCard(CardView card);
+    void setPaperCard(CardView card);
     void setPlayerAvatar(LobbyPlayer player, IHasIcon ihi);
     boolean openZones(Collection<ZoneType> zones, Map<PlayerView, Object> players);
     void restoreOldZones(Map<PlayerView, Object> playersToRestoreZonesFor);

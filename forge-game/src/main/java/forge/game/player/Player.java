@@ -1734,6 +1734,10 @@ public class Player extends GameEntity implements Comparable<Player> {
             return false;
         }
 
+        if (!game.getPhaseHandler().isPlayerTurn(this)) {
+            return false;
+        }
+
         // CantBeCast static abilities
         for (final Card ca : game.getCardsIn(ZoneType.listValueOf("Battlefield,Command"))) {
             final Iterable<StaticAbility> staticAbilities = ca.getStaticAbilities();
@@ -2655,6 +2659,9 @@ public class Player extends GameEntity implements Comparable<Player> {
         return damage == null ? 0 : damage.intValue();
     }
 
+    public Iterable<Entry<Card, Integer>> getCommanderCast() {
+        return commanderCast.entrySet();
+    }
     public int getCommanderCast(Card commander) {
         Integer cast = commanderCast.get(commander);
         return cast == null ? 0 : cast.intValue();
@@ -2662,6 +2669,7 @@ public class Player extends GameEntity implements Comparable<Player> {
 
     public void incCommanderCast(Card commander) {
         commanderCast.put(commander, getCommanderCast(commander) + 1);
+        view.updateCommanderCast(this);
     }
 
     public int getTotalCommanderCast() {

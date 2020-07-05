@@ -1296,10 +1296,9 @@ public class Card extends GameEntity implements Comparable<Card> {
 
                 // play the Add Counter sound
                 getGame().fireEvent(new GameEventCardCounters(this, counterType, oldValue == null ? 0 : oldValue, newValue));
-            }
-
-            for(Player p : game.getPlayers()) {
-                getGame().fireEvent(new GameEventZone(ZoneType.Battlefield, p, EventValueChangeType.ComplexUpdate, null));
+                for(Player p : game.getPlayers()) {
+                    getGame().fireEvent(new GameEventZone(ZoneType.Battlefield, p, EventValueChangeType.ComplexUpdate, null));
+                }
             }
 
             // Run triggers
@@ -2080,7 +2079,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         }
 
         if (isGoaded()) {
-            sb.append("is goaded by: ").append(Lang.joinHomogenous(getGoaded()));
+            sb.append("Goaded by: ").append(Lang.joinHomogenous(getGoaded()));
             sb.append("\r\n");
         }
 
@@ -5065,7 +5064,7 @@ public class Card extends GameEntity implements Comparable<Card> {
     public void exert() {
         exertedByPlayer.add(getController());
         exertThisTurn++;
-        view.updateExertedThisTurn(this, true);
+        view.updateExerted(this, exertedByPlayer);
         final Map<AbilityKey, Object> runParams = AbilityKey.mapFromCard(this);
         runParams.put(AbilityKey.Player, getController());
         game.getTriggerHandler().runTrigger(TriggerType.Exerted, runParams, false);
@@ -5077,7 +5076,7 @@ public class Card extends GameEntity implements Comparable<Card> {
 
     public void removeExertedBy(final Player player) {
         exertedByPlayer.remove(player);
-        view.updateExertedThisTurn(this, getExertedThisTurn() > 0);
+        view.updateExerted(this, exertedByPlayer);
     }
 
     protected void resetExtertedThisTurn() {
@@ -5833,10 +5832,6 @@ public class Card extends GameEntity implements Comparable<Card> {
         // this can only be called by the Human
         final List<SpellAbility> abilities = Lists.newArrayList();
         for (SpellAbility sa : getSpellAbilities()) {
-            if (sa.toString().startsWith("Fuse (")
-                    && player.getGame().getZoneOf(this).getZoneType() != ZoneType.Hand) {
-                continue;
-            }
             //add alternative costs as additional spell abilities
             abilities.add(sa);
             abilities.addAll(GameActionUtil.getAlternativeCosts(sa, player));

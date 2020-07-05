@@ -294,6 +294,7 @@ public class AnimateEffect extends AnimateEffectBase {
                     c.removeChangedName(timestamp);
                     c.updateStateForView();
 
+                    c.updateAbilityTextForView();
                     game.fireEvent(new GameEventCardStatsChanged(c));
 
                     for (final SpellAbility sa : removedAbilities) {
