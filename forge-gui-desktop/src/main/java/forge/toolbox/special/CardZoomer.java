@@ -69,6 +69,8 @@ public enum CardZoomer {
     // Used to ignore mouse wheel rotation for a short period of time.
     private Timer mouseWheelCoolDownTimer;
     private boolean isMouseWheelEnabled = false;
+    private Timer keyCoolDownTimer;
+    private boolean isKeyEnabled = true;
 
     // ctr
     CardZoomer() {
@@ -82,6 +84,7 @@ public enum CardZoomer {
         this.thisCard = card;
         this.mayFlip = mayFlip;
         this.isInAltState = card != null && card == card.getCard().getAlternateState();
+        isKeyEnabled = true;
     }
 
     /**
@@ -98,8 +101,9 @@ public enum CardZoomer {
                         closeZoomer();
                     }
                 }
-                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                if (isKeyEnabled && (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_ALT)) {
                     toggleCardImage();
+                    startKeyCoolDownTimer(250);
                 }
             }
         });
@@ -251,6 +255,7 @@ public enum CardZoomer {
     public void closeZoomer() {
         if (!isOpen) { return; }
         stopMouseWheelCoolDownTimer();
+        stopKeyCoolDownTimer();
         isOpen = false;
         SOverlayUtils.hideOverlay();
         lastClosedTime = System.currentTimeMillis();
@@ -284,6 +289,29 @@ public enum CardZoomer {
     private void stopMouseWheelCoolDownTimer() {
         if (mouseWheelCoolDownTimer != null && mouseWheelCoolDownTimer.isRunning()) {
             mouseWheelCoolDownTimer.stop();
+        }
+    }
+
+    private void startKeyCoolDownTimer(final int millisecsDelay) {
+        isKeyEnabled = false;
+        createKeyCoolDownTimer(millisecsDelay);
+        keyCoolDownTimer.setInitialDelay(millisecsDelay);
+        keyCoolDownTimer.restart();
+    }
+
+    private void createKeyCoolDownTimer(final int millisecsDelay) {
+        if (keyCoolDownTimer == null) {
+        	keyCoolDownTimer = new Timer(millisecsDelay, new ActionListener() {
+                @Override public void actionPerformed(final ActionEvent e) {
+                	isKeyEnabled = true;
+                }
+            });
+        }
+    }
+
+    private void stopKeyCoolDownTimer() {
+        if (keyCoolDownTimer != null && keyCoolDownTimer.isRunning()) {
+        	keyCoolDownTimer.stop();
         }
     }
 

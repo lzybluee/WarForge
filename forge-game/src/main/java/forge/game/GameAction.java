@@ -399,6 +399,13 @@ public class GameAction {
             c.setMustAttackEntity(null);
         }
 
+        if(c.getTimestamp() == -1 && (toBattlefield || zoneTo.is(ZoneType.Graveyard)
+                || zoneTo.is(ZoneType.Hand)
+                || zoneTo.is(ZoneType.Library)
+                || zoneTo.is(ZoneType.Exile))) {
+            c.setTimestamp(game.getTimestamp() + 1);
+        }
+
         // Need to apply any static effects to produce correct triggers
         checkStaticAbilities();
         game.getTriggerHandler().clearInstrinsicActiveTriggers(c, zoneFrom);
@@ -1112,7 +1119,7 @@ public class GameAction {
 
         for(Player p : game.getPlayers()) {
             p.updateFlashbackForView();
-            p.getGame().fireEvent(new GameEventZone(ZoneType.Flashback, p, EventValueChangeType.ComplexUpdate, null));
+            game.fireEvent(new GameEventZone(ZoneType.Flashback, p, EventValueChangeType.ComplexUpdate, null));
         }
     }
 
@@ -1588,8 +1595,8 @@ public class GameAction {
             // Where there are none, it should bring up speed controls
             game.fireEvent(new GameEventGameStarted(gameType, first, game.getPlayers()));
 
-            // Emissary's Plot
-            // runPreOpeningHandActions(first);
+            game.getTriggerHandler().setSuppressAllTriggers(true);
+            game.getReplacementHandler().setSuppressAll(true);
 
             game.setAge(GameStage.Mulligan);
             for (final Player p1 : game.getPlayers()) {
@@ -1598,9 +1605,6 @@ public class GameAction {
                 } else {
                     p1.drawCards(p1.getStartingHandSize());
                 }
-
-                // If pl has Backup Plan as a Conspiracy draw that many extra hands
-
             }
 
             // Choose starting hand for each player with multiple hands
@@ -1617,6 +1621,10 @@ public class GameAction {
             }
 
             runOpeningHandActions(first);
+
+            game.getTriggerHandler().setSuppressAllTriggers(false);
+            game.getReplacementHandler().setSuppressAll(false);
+
             checkStateEffects(true); // why?
 
             // Run Trigger beginning of the game

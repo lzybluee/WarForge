@@ -292,6 +292,9 @@ public abstract class GameState {
                     newText.append(":Manifested");
                 }
             }
+            if (c.isBestowed()) {
+                newText.append("|Bestowed");
+            }
             if (c.getCurrentStateName().equals(CardStateName.Transformed)) {
                 newText.append("|Transformed");
             } else if (c.getCurrentStateName().equals(CardStateName.Flipped)) {
@@ -637,11 +640,16 @@ public abstract class GameState {
             }
         }
 
+        game.getStack().clear();
         game.getStack().setResolving(false);
 
         // Advance to a certain phase, activating all triggered abilities
         if (advPhase != null) {
             game.getPhaseHandler().devAdvanceToPhase(advPhase);
+        }
+
+        if(tChangePlayer.equalsIgnoreCase("ai")) {
+        	game.getPhaseHandler().setPriority(human);
         }
 
         if (removeSummoningSickness) {
@@ -1196,6 +1204,8 @@ public abstract class GameState {
                     if (info.endsWith("Manifested")) {
                         c.setManifested(true);
                     }
+                } else if (info.startsWith("Bestowed")) {
+                    c.animateBestow();
                 } else if (info.startsWith("Transformed")) {
                     c.setState(CardStateName.Transformed, true);
                 } else if (info.startsWith("Flipped")) {

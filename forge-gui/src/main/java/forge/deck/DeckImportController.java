@@ -49,12 +49,18 @@ public class DeckImportController {
 
     public List<DeckRecognizer.Token> parseInput(String input) {
         tokens.clear();
+        input = input.replaceAll("Æ", "Ae");
 
         DeckRecognizer recognizer = new DeckRecognizer(newEditionCheck.isSelected(),  onlyCoreExpCheck.isSelected(), FModel.getMagicDb().getCommonCards());
         if (dateTimeCheck.isSelected()) {
             recognizer.setDateConstraint(monthDropdown.getSelectedIndex(), yearDropdown.getSelectedItem());
         }
-        String[] lines = input.split("\n");
+        String[] lines = null;
+        if(input.contains("\n")) {
+        	lines = input.split("\n");
+        } else {
+        	lines = input.split("\r");
+        }
         for (String line : lines) {
             tokens.add(recognizer.recognizeLine(line));
         }
@@ -93,7 +99,7 @@ public class DeckImportController {
     }
 
     public Deck accept() {
-        if (tokens.isEmpty()) { return null; }
+    	if (tokens.isEmpty()) { return null; }
 
         if (replacingDeck) {
             final String warning = "This will replace the contents of your current deck with these cards.\n\nProceed?";
@@ -103,46 +109,37 @@ public class DeckImportController {
         }
 
         final Deck result = new Deck();
-        DeckSection deckSection = DeckSection.Main;
-        String section = "";
+        boolean isMain = true;
+        boolean isCommander = false;
         for (final DeckRecognizer.Token t : tokens) {
             final DeckRecognizer.TokenType type = t.getType();
             if (type == DeckRecognizer.TokenType.SectionName) {
-                section = t.getText().toLowerCase();
-                if (section.startsWith("//")) {
-                    continue;
-                }
-                // can't use wildcards in switch/case, so if/else it is
-                if (section.startsWith("main")) {
-                    deckSection = DeckSection.Main;
-                }
-                else if (section.startsWith("side")) {
-                    deckSection = DeckSection.Sideboard;
-                }
-                else if (section.startsWith("commander")) {
-                    deckSection = DeckSection.Commander;
-                }
-                else if (section.startsWith("avatar")) {
-                    deckSection = DeckSection.Avatar;
-                }
-                else if (section.startsWith("planes")) {
-                    deckSection = DeckSection.Planes;
-                }
-                else if (section.startsWith("scheme")) {
-                    deckSection = DeckSection.Schemes;
-                }
-                else if (section.startsWith("conspiracy")) {
-                    deckSection = DeckSection.Conspiracy;
-                }
-                else {
-                    throw new NotImplementedException("Unexpected section: " + t.getText());
-                }
+            	if(t.getText().toLowerCase().contains("commander")) {
+            		isCommander = true;
+            	} else {
+            		isCommander = false;
+            		if(t.getText().toLowerCase().contains("side")) {
+                		isMain = false;
+                	}
+            	}
+            	continue;
             }
             if (type != DeckRecognizer.TokenType.KnownCard) {
+            	if(!t.getText().trim().isEmpty()) {
+            		isCommander = false;
+            	}
                 continue;
             }
             final PaperCard crd = t.getCard();
-            result.getOrCreate(deckSection).add(crd, t.getNumber());
+            if(isCommander) {
+            	result.getOrCreate(DeckSection.Commander).add(crd, t.getNumber());
+            }
+            else if (isMain) {
+                result.getMain().add(crd, t.getNumber());
+            }
+            else {
+                result.getOrCreate(DeckSection.Sideboard).add(crd, t.getNumber());
+            }
         }
         return result;
     }

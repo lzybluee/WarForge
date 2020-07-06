@@ -262,6 +262,9 @@ public final class GameActionUtil {
                 if (keyword.contains(":")) {
                     final String[] k = keyword.split(":");
                     flashback.setPayCosts(new Cost(k[1], false));
+                    flashback.setDescription(inst.getReminderText());
+                } else {
+                	flashback.setDescription("You may cast this card from your graveyard by paying its mana cost. If you do, exile it as it resolves.");
                 }
                 alternatives.add(flashback);
             }

@@ -107,6 +107,10 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
     public final IGuiGame getGui() {
         return gui;
     }
+    
+    public boolean shouldAutoYieldCard(String cardName) {
+        return gui != null && gui.shouldAutoYieldCard(cardName);
+    }
 
     public final void setGui(final IGuiGame gui) {
         this.gui = gui;
@@ -211,7 +215,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
     }
 
     @Override
-    public List<PaperCard> sideboard(final Deck deck, final GameType gameType, String message) {
+    public List<PaperCard> sideboard(final Deck deck, final GameRules gameRules, String message) {
         CardPool sideboard = deck.get(DeckSection.Sideboard);
         if (sideboard == null) {
             // Use an empty cardpool instead of null for 75/0 sideboarding scenario.
@@ -224,8 +228,20 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         final int sbSize = sideboard.countAll();
         final int combinedDeckSize = mainSize + sbSize;
 
-        final int deckMinSize = Math.min(mainSize, gameType.getDeckFormat().getMainRange().getMinimum());
-        final Range<Integer> sbRange = gameType.getDeckFormat().getSideRange();
+        int deckMinMainSize = 0;
+        if(gameRules.getAppliedVariants() != null) {
+        	for(GameType type : gameRules.getAppliedVariants()) {
+        		int min = type.getDeckFormat().getMainRange().getMinimum();
+        		if(min > deckMinMainSize) {
+        			deckMinMainSize = min;
+        		}
+        	}
+        } else {
+        	deckMinMainSize = gameRules.getGameType().getDeckFormat().getMainRange().getMinimum();
+        }
+
+        final int deckMinSize = Math.min(mainSize, deckMinMainSize);
+        final Range<Integer> sbRange = gameRules.getGameType().getDeckFormat().getSideRange();
         // Limited doesn't have a sideboard max, so let the Main min take care
         // of things.
         final int sbMax = sbRange == null ? combinedDeckSize : sbRange.getMaximum();
@@ -459,7 +475,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         final GameEntityView result = getGui().chooseSingleEntityForEffect(title,
                 GameEntityView.getEntityCollection(optionList), delayedReveal, isOptional);
         endTempShowCards();
-	return (T) convertToEntity(result);
+        return (T) convertToEntity(result);
     }
 
     @SuppressWarnings("unchecked")
@@ -491,12 +507,12 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
             input.setCancelAllowed(true);
             input.setMessage(MessageUtil.formatMessage(title, player, targetedPlayer));
             input.showAndWait();
-	    endTempShowCards();
+            endTempShowCards();
             return (List<T>) input.getSelected();
-	}
-	final List<GameEntityView> chosen = getGui().chooseEntitiesForEffect(title,
- 		GameEntityView.getEntityCollection(optionList), min, max, delayedReveal);
-	endTempShowCards();
+        }
+		final List<GameEntityView> chosen = getGui().chooseEntitiesForEffect(title,
+	 		GameEntityView.getEntityCollection(optionList), min, max, delayedReveal);
+		endTempShowCards();
 
         List<T> results = new ArrayList<>();  //pfps I'm not sure that the chosens should be modified this way
         if (chosen instanceof List && chosen.size() > 0) {
@@ -541,7 +557,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         getGui().setPaperCard(CardView.get(sa.getHostCard()));
 
         // create a mapping between a spell's view and the spell itself
-        HashMap<SpellAbilityView, SpellAbility> spellViewCache = new HashMap<>();
+        LinkedHashMap<SpellAbilityView, SpellAbility> spellViewCache = new LinkedHashMap<>();
         for (SpellAbility spellAbility : spells) {
             spellViewCache.put(spellAbility.getView(), spellAbility);
         }
@@ -614,6 +630,10 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         }
         if (getGui().shouldAlwaysDeclineTrigger(regtrig.getId())) {
             return false;
+        }
+        final String cardName = sa.getHostCard() == null ? null : sa.getHostCard().getName();
+        if (getGui().shouldAutoYieldCard(cardName)) {
+            return true;
         }
 
         // triggers with costs can always be declined by not paying the cost
@@ -1276,7 +1296,9 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
             }
         } else {
             final SpellAbility ability = stack.peekAbility();
-            if (ability != null && ability.isAbility() && getGui().shouldAutoYield(ability.yieldKey())) {
+            final String cardName = ability.getHostCard() == null ? null : ability.getHostCard().getName();
+            if (ability != null && ability.isAbility() &&
+            		(getGui().shouldAutoYieldCard(cardName) || getGui().shouldAutoYield(ability.yieldKey()))) {
                 // avoid prompt for input if top ability of stack is set to
                 // auto-yield
                 try {
@@ -1479,6 +1501,19 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         final String modeTitle = TextUtil.concatNoSpace(sa.getActivatingPlayer().toString(), " activated ",
                 sa.getHostCard().toString(), " - Choose a mode");
         final List<AbilitySub> chosen = Lists.newArrayListWithCapacity(num);
+
+        final String cardName = sa.getHostCard() == null ? null : sa.getHostCard().getName();
+        if(num == 1 && choices.size() == 2 && getGui().shouldAutoYieldCard(cardName)) {
+        	if(choices.get(0).toString().startsWith("Untap ") && choices.get(1).toString().startsWith("Tap ")) {
+            	chosen.add(spellViewCache.get(choices.get(0)));
+            	return chosen;
+        	}
+        	if(choices.get(1).toString().startsWith("Untap ") && choices.get(0).toString().startsWith("Tap ")) {
+            	chosen.add(spellViewCache.get(choices.get(1)));
+            	return chosen;
+        	}
+        }
+
         for (int i = 0; i < num; i++) {
             SpellAbilityView a;
             if (i < min) {
@@ -2199,6 +2234,9 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         	if(player) {
         		final String titleMsg = subtract ? "Remove counters from which player?" : "Add counters to which player?";
                 final Player p = game.getPlayer(getGui().oneOrNone(titleMsg, PlayerView.getCollection(game.getPlayers())));
+                if(p == null) {
+                	return;
+                }
                 final CounterType counter = getGui().oneOrNone("Which type of counter?",
                         Lists.newArrayList(CounterType.ENERGY, CounterType.EXPERIENCE, CounterType.POISON));
                 if (counter == null) {
@@ -2218,7 +2256,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
                 }
             } else {
 	            final String titleMsg = subtract ? "Remove counters from which card?" : "Add counters to which card?";
-	            final CardCollectionView cards = game.getCardsIn(ZoneType.Battlefield);
+	            final CardCollectionView cards = game.getCardsIn(ZoneType.listValueOf("Battlefield,Exile,Stack"));
 	            final Card card = game
 	                    .getCard(getGui().oneOrNone(titleMsg, CardView.getCollection(cards)));
 	            if (card == null) {

@@ -13,6 +13,7 @@ import forge.game.Game;
 import forge.game.GameEntity;
 import forge.game.GameObject;
 import forge.game.GameOutcome.AnteResult;
+import forge.game.GameRules;
 import forge.game.GameType;
 import forge.game.card.*;
 import forge.game.combat.Combat;
@@ -91,7 +92,7 @@ public abstract class PlayerController {
     public abstract void playSpellAbilityForFree(SpellAbility copySA, boolean mayChoseNewTargets);
     public abstract void playSpellAbilityNoStack(SpellAbility effectSA, boolean mayChoseNewTargets);
 
-    public abstract List<PaperCard> sideboard(final Deck deck, GameType gameType, String message);
+    public abstract List<PaperCard> sideboard(final Deck deck, GameRules gameRules, String message);
     public abstract List<PaperCard> chooseCardsYouWonToAddToDeck(List<PaperCard> losses);
 
     public abstract Map<Card, Integer> assignCombatDamage(Card attacker, CardCollectionView blockers, int damageDealt, GameEntity defender, boolean overrideOrder);
@@ -259,6 +260,10 @@ public abstract class PlayerController {
 
     public boolean isGuiPlayer() {
         return false;
+    }
+    
+    public boolean shouldAutoYieldCard(String cardName) {
+    	return false;
     }
 
     public boolean canPlayUnlimitedLands() {

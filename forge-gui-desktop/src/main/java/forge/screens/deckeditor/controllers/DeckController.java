@@ -414,7 +414,9 @@ public class DeckController<T extends DeckBase> {
         itemManagerCaption += " - ";
 
         VCurrentDeck.SINGLETON_INSTANCE.getTabLabel().setText(tabCaption);
-        VCurrentDeck.SINGLETON_INSTANCE.getTxfTitle().setText(title);
+        if(saved) {
+            VCurrentDeck.SINGLETON_INSTANCE.getTxfTitle().setText(title);
+        }
         VCurrentDeck.SINGLETON_INSTANCE.getItemManager().setCaption(itemManagerCaption);
         DeckFileMenu.updateSaveEnabled();
     }

@@ -65,12 +65,13 @@ public enum TrackableProperty {
     AlternateState(TrackableTypes.CardStateViewType),
     HiddenId(TrackableTypes.IntegerType),
     Exerted(TrackableTypes.PlayerViewCollectionType),
+    PlaneswalkerAbilityActivited(TrackableTypes.IntegerType),
 
     //Card State
     Name(TrackableTypes.StringType),
     Colors(TrackableTypes.ColorSetType),
     ImageKey(TrackableTypes.StringType),
-    Type(TrackableTypes.CardTypeViewType),
+    Type(TrackableTypes.CardTypeViewType, FreezeMode.IgnoresFreeze),
     ManaCost(TrackableTypes.ManaCostType),
     SetCode(TrackableTypes.StringType),
     Rarity(TrackableTypes.EnumType(CardRarity.class)),

@@ -47,7 +47,7 @@ public enum VSubmenuGauntletQuick implements IVSubmenu<CSubmenuGauntletQuick> {
         .text(localizer.getMessage("lblDecklist"))
         .fontSize(12).build();
 
-    private final SkinnedSlider sliOpponents = new SkinnedSlider(SwingConstants.HORIZONTAL, 5, 50, 20);
+    private final SkinnedSlider sliOpponents = new SkinnedSlider(SwingConstants.HORIZONTAL, 5, 50, 5);
     //private SkinnedSlider sliGamesPerMatch = new SkinnedSlider(JSlider.HORIZONTAL, 1, 7, 3);
 
     private final JCheckBox boxUserDecks = new FCheckBox(DeckType.CUSTOM_DECK.toString());

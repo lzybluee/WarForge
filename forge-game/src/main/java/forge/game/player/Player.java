@@ -466,6 +466,14 @@ public class Player extends GameEntity implements Comparable<Player> {
         return !hasKeyword("You can't gain life.") && !hasKeyword("Your life total can't change.");
     }
 
+    public final void refundLife(final int toAdd) {
+    	int oldLife = life;
+        life += toAdd;
+        lifeLostThisTurn -= toAdd;
+        view.updateLife(this);
+        game.fireEvent(new GameEventPlayerLivesChanged(this, oldLife, life));
+    }
+
     public final int loseLife(final int toLose) {
     	return loseLife(toLose,false);
     }
@@ -2304,7 +2312,7 @@ public class Player extends GameEntity implements Comparable<Player> {
     }
     public final void resetSpellsCastThisTurn() {
         spellsCastThisTurn = 0;
-        view.updateLandsPlayedThisTurn(this);
+        view.updateSpellsCastThisTurn(this);
     }
     public final void setSpellsCastLastTurn(int num) {
         spellsCastLastTurn = num;

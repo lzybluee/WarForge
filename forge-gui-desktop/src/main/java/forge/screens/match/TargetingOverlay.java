@@ -89,6 +89,7 @@ public class TargetingOverlay {
     }
 
     private final Set<CardView> cardsVisualized = new HashSet<>();
+    private final Set<PlayerView> playersVisualized = new HashSet<PlayerView>();
     private CardPanel activePanel = null;
 
     //private long lastUpdated = System.currentTimeMillis(); // TODO: determine if timer is needed (see below)
@@ -128,6 +129,7 @@ public class TargetingOverlay {
         arcsFriend.clear();
         cardPanels.clear();
         cardsVisualized.clear();
+        playersVisualized.clear();
 
         final StackInstanceTextArea activeStackItem = matchUI.getCStack().getView().getHoveredItem();
 
@@ -256,6 +258,7 @@ public class TargetingOverlay {
         arcsFriend.clear();
         cardPanels.clear();
         cardsVisualized.clear();
+        playersVisualized.clear();
 
         switch (matchUI.getCDock().getArcState()) {
             case OFF:
@@ -429,6 +432,7 @@ public class TargetingOverlay {
     private void addArcsForCard(final CardView c, final Map<Integer, Point> endpoints, final CombatView combat) {
         final CardView attachedTo = c.getAttachedTo();
         final Iterable<CardView> attachedCards = c.getAttachedCards();
+        final PlayerView enchantingPlayer = c.getEnchantedPlayer();
         final CardView paired = c.getPairedWith();
 
         if (null != attachedTo) {
@@ -444,6 +448,14 @@ public class TargetingOverlay {
                     cardsVisualized.add(enc);
                 }
             }
+        }
+        if (null != enchantingPlayer) {
+        	Point locOnScreen = this.getPanel().getLocationOnScreen();
+        	Point point = getPlayerTargetingArrowPoint(enchantingPlayer, locOnScreen);
+            if(point != null) {
+                addArc(point, endpoints.get(c.getId()), ArcConnection.Friends);
+            }
+            playersVisualized.add(enchantingPlayer);
         }
         if (null != paired) {
             addArc(endpoints.get(paired.getId()), endpoints.get(c.getId()), ArcConnection.Friends);

@@ -258,7 +258,7 @@ public abstract class InputPayMana extends InputSyncronizedBase {
             }
         }
 
-        if (abilitiesMap.isEmpty() || (chosenAbility != null && !abilitiesMap.containsKey(chosenAbility.getView()))) {
+        if (abilitiesMap.isEmpty() || (chosenAbility != null && !abilitiesMap.containsValue(chosenAbility))) {
             return false;
         }
 

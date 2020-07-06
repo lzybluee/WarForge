@@ -1914,13 +1914,13 @@ public class Card extends GameEntity implements Comparable<Card> {
         }
 
         if (monstrous) {
-            sb.append("Monstrous\r\n");
+            sb.append("==Monstrous==\r\n");
         }
         if (renowned) {
-            sb.append("Renowned\r\n");
+            sb.append("==Renowned==\r\n");
         }
         if (manifested) {
-            sb.append("Manifested\r\n");
+            sb.append("==Manifested==\r\n");
         }
         sb.append(keywordsToText(getUnhiddenKeywords(state)));
 
@@ -5097,6 +5097,7 @@ public class Card extends GameEntity implements Comparable<Card> {
     }
     public final void setMonstrous(final boolean monstrous0) {
         monstrous = monstrous0;
+        updateAbilityTextForView();
     }
 
     public final boolean isRenowned() {
@@ -5104,6 +5105,7 @@ public class Card extends GameEntity implements Comparable<Card> {
     }
     public final void setRenowned(final boolean renowned0) {
         renowned = renowned0;
+        updateAbilityTextForView();
     }
 
     public final boolean isManifested() {
@@ -5124,6 +5126,7 @@ public class Card extends GameEntity implements Comparable<Card> {
                 }
             }
         }
+        updateAbilityTextForView();
     }
 
     public final void animateBestow() {
@@ -5147,9 +5150,6 @@ public class Card extends GameEntity implements Comparable<Card> {
         removeChangedCardKeywords(bestowTimestamp, updateView);
         removeChangedCardTypes(bestowTimestamp, updateView);
         bestowTimestamp = -1;
-        if(updateView) {
-            game.fireEvent(new GameEventCardStatsChanged(this));
-        }
     }
 
     public final boolean isBestowed() {
@@ -6284,10 +6284,12 @@ public class Card extends GameEntity implements Comparable<Card> {
 
     public void addPlaneswalkerAbilityActivated() {
         planeswalkerAbilityActivated++;
+        view.updatePlaneswalkerAbilityActivited(planeswalkerAbilityActivated);
     }
 
     public void resetActivationsPerTurn() {
         planeswalkerAbilityActivated = 0;
+        view.updatePlaneswalkerAbilityActivited(planeswalkerAbilityActivated);
         numberTurnActivations.clear();
         numberTurnActivationsStatic.clear();
     }

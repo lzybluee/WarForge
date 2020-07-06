@@ -1726,6 +1726,9 @@ public class AbilityUtils {
                 continue;
             }
             newSA.setActivatingPlayer(controller);
+            if (!newSA.meetsCommonRequirements()) {
+            	continue;
+            }
             SpellAbilityRestriction res = new SpellAbilityRestriction();
             // timing restrictions still apply
             res.setPlayerTurn(s.getRestrictions().getPlayerTurn());

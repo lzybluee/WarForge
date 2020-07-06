@@ -166,11 +166,25 @@ public class AiBlockController {
         return sortedAttackers;
     }
 
+    List<Card> getMustBlockCards(Card attacker) {
+        List<Card> blockers = new ArrayList<>();
+        for(Card blocker : blockersLeft) {
+            if(blocker.getMustBlockCards() != null && blocker.getMustBlockCards().contains(attacker)) {
+                blockers.add(blocker);
+            }
+        }
+        if(blockers.isEmpty()) {
+            return blockersLeft;
+        } else {
+            return blockers;
+        }
+    }
+
     // ======================= block assignment functions
     // ================================
 
     // Good Blocks means a good trade or no trade
-    private void makeGoodBlocks(final Combat combat) {
+    private void makeGoodBlocks(final Combat combat, boolean mustBlockFirst) {
 
         List<Card> currentAttackers = new ArrayList<>(attackersLeft);
 
@@ -184,7 +198,7 @@ public class AiBlockController {
 
             Card blocker = null;
 
-            final List<Card> blockers = getPossibleBlockers(combat, attacker, blockersLeft, true);
+            final List<Card> blockers = getPossibleBlockers(combat, attacker, mustBlockFirst ? getMustBlockCards(attacker) : blockersLeft, true);
 
             final List<Card> safeBlockers = getSafeBlockers(combat, attacker, blockers);
             List<Card> killingBlockers;
@@ -1015,7 +1029,7 @@ public class AiBlockController {
         CardLists.sortByPowerAsc(blockersLeft);
 
         // == 1. choose best blocks first ==
-        makeGoodBlocks(combat);
+        makeGoodBlocks(combat, true);
         makeGangBlocks(combat);
 
         // When the AI holds some Fog effect, don't bother about lifeInDanger
@@ -1052,7 +1066,7 @@ public class AiBlockController {
                                                          // assignment
                 makeTradeBlocks(combat); // choose necessary trade blocks
                 // if life is in danger
-                makeGoodBlocks(combat);
+                makeGoodBlocks(combat, false);
                 // choose necessary chump blocks if life is still in danger
                 if (ComputerUtilCombat.lifeInDanger(ai, combat)) {
                     makeChumpBlocks(combat);
@@ -1081,7 +1095,7 @@ public class AiBlockController {
                 }
 
                 if (!ComputerUtilCombat.lifeInDanger(ai, combat)) {
-                    makeGoodBlocks(combat);
+                    makeGoodBlocks(combat, false);
                 }
                 // Reinforce blockers blocking attackers with trample if life is
                 // still in danger

@@ -246,7 +246,7 @@ public class Match {
 
                 String forPlayer = " for " + player.getName();
                 Deck toChange = psc.getDeck();
-                List<PaperCard> newMain = person.sideboard(toChange, rules.getGameType(), forPlayer);
+                List<PaperCard> newMain = person.sideboard(toChange, rules, forPlayer);
                 if (null != newMain) {
                     CardPool allCards = new CardPool();
                     allCards.addAll(toChange.get(DeckSection.Main));
@@ -290,11 +290,11 @@ public class Match {
                 Collection<? extends PaperCard> cardsComplained = player.getController().complainCardsCantPlayWell(myDeck);
                 if (null != cardsComplained && cardsComplained.size() > 0) {
                     rAICards.putAll(player, cardsComplained);
+                    System.out.println("AI can't play these cards well");
                     for(PaperCard card : cardsComplained) {
                         System.out.println(card.getName());
                     }
                 }
-                System.out.println("AI can't play these cards well");
             }
 
             if (myRemovedAnteCards != null && !myRemovedAnteCards.isEmpty()) {

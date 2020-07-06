@@ -394,6 +394,9 @@ public class StaticAbility extends CardTraitBase implements IIdentifiable, Clone
             return StaticAbilityCantTarget.applyCantTargetAbility(this, card, spellAbility);
         }
 
+        if (mode.equals("CantPlayLand")) {
+        	return StaticAbilityCantBeCast.applyCantPlayLandAbility(this, card, spellAbility.getActivatingPlayer());
+        }
         return false;
     }
 

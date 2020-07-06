@@ -223,6 +223,13 @@ public class CardView extends GameEntityView {
         return type;
     }
 
+    public int getPlaneswalkerAbilityActivited() {
+        return get(TrackableProperty.PlaneswalkerAbilityActivited);
+    }
+    void updatePlaneswalkerAbilityActivited(int n) {
+        set(TrackableProperty.PlaneswalkerAbilityActivited, n);
+    }
+
     public Map<CounterType, Integer> getCounters() {
         return get(TrackableProperty.Counters);
     }
