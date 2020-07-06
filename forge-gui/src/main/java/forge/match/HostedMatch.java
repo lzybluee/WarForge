@@ -236,7 +236,8 @@ public class HostedMatch {
                 }
                 // Actually start the game!
                 match.startGame(game, startGameHook, FModel.getPreferences().getPref(FPref.UI_START_PLAYER),
-                		FModel.getPreferences().getPrefBoolean(FPref.UI_SKIP_RESTORE_DECK));
+                		FModel.getPreferences().getPrefBoolean(FPref.UI_SKIP_RESTORE_DECK),
+                		FModel.getPreferences().getPrefBoolean(FPref.UI_ENABLE_MTGA_SHUFFLE));
 
                 // After game is over...
                 isMatchOver = match.isMatchOver();

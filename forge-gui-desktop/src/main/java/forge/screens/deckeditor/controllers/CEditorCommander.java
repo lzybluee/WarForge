@@ -78,8 +78,8 @@ public final class CEditorCommander extends CDeckEditor<Deck> {
         super(gameType0 == GameType.TinyLeaders ? FScreen.DECK_EDITOR_TINY_LEADERS : gameType0 == GameType.Brawl ? FScreen.DECK_EDITOR_BRAWL :
                 gameType0 == GameType.Oathbreaker ? FScreen.DECK_EDITOR_OATHBREAKER : FScreen.DECK_EDITOR_COMMANDER, cDetailPicture, gameType0);
         allSections.add(DeckSection.Main);
-        allSections.add(DeckSection.Sideboard);
         allSections.add(DeckSection.Commander);
+        allSections.add(DeckSection.Sideboard);
 
         CardDb commonCards = FModel.getMagicDb().getCommonCards();
         if (gameType == GameType.Brawl){

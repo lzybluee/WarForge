@@ -69,11 +69,11 @@ public class Match {
     }
 
     public void startGame(final Game game) {
-        startGame(game, null, null, false);
+        startGame(game, null, null, false, false);
     }
 
-    public void startGame(final Game game, Runnable startGameHook, String startPlayer, boolean skipRestore) {
-        prepareAllZones(game, skipRestore);
+    public void startGame(final Game game, Runnable startGameHook, String startPlayer, boolean skipRestore, boolean mtgaShuffle) {
+        prepareAllZones(game, skipRestore, mtgaShuffle);
         if (rules.useAnte()) {  // Deciding which cards go to ante
             Multimap<Player, Card> list = game.chooseCardsForAnte(rules.getMatchAnteRarity());
             for (Entry<Player, Card> kv : list.entries()) {
@@ -201,7 +201,7 @@ public class Match {
         library.setCards(newLibrary);
     }
 
-    private void prepareAllZones(final Game game, boolean skipRestore) {
+    private void prepareAllZones(final Game game, boolean skipRestore, boolean mtgaShuffle) {
         // need this code here, otherwise observables fail
         Trigger.resetIDs();
         game.getTriggerHandler().clearDelayedTrigger();
@@ -280,8 +280,11 @@ public class Match {
 
             player.initVariantsZones(psc);
 
-            player.shuffle(null);
-
+            if(!player.isAI() && mtgaShuffle) {
+                player.MTGAShuffle(null);
+            } else {
+                player.shuffle(null);
+            }
 
             if (isFirstGame) {
                 Collection<? extends PaperCard> cardsComplained = player.getController().complainCardsCantPlayWell(myDeck);

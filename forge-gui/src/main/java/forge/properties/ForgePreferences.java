@@ -72,6 +72,7 @@ public class ForgePreferences extends PreferencesStore<ForgePreferences.FPref> {
         UI_USE_OLD ("false"),
         UI_RANDOM_FOIL ("false"),
         UI_ENABLE_AI_CHEATS ("false"),
+        UI_ENABLE_MTGA_SHUFFLE ("false"),
         UI_AVATARS ("0,1"),
         UI_SHOW_CARD_OVERLAYS ("true"),
         UI_OVERLAY_CARD_NAME ("true"),

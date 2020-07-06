@@ -1674,6 +1674,85 @@ public class Player extends GameEntity implements Comparable<Player> {
         return topCards;
     }
 
+    private final void shuffleCards(CardCollection list) {
+        // overdone but wanted to make sure it was really random
+        final Random random = MyRandom.getRandom();
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+
+        int s = list.size();
+        for (int i = 0; i < s; i++) {
+            list.add(random.nextInt(s - 1), list.remove(random.nextInt(s)));
+        }
+
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+        Collections.shuffle(list, random);
+    }
+
+    public final void MTGAShuffle(final SpellAbility sa) {
+        if (getCardsIn(ZoneType.Library).size() <= 1) {
+            return;
+        }
+        
+        final CardCollection listA = new CardCollection(getCardsIn(ZoneType.Library));
+        final CardCollection listB = new CardCollection(getCardsIn(ZoneType.Library));
+
+        shuffleCards(listA);
+        shuffleCards(listB);
+
+        int lands = 0;
+        int cards = listA.size();
+        for(Card c : listA) {
+            if(c.isLand()) {
+                lands++;
+            }
+        }
+        float deckLandRadio = (float)lands / cards;
+
+        int landsA = 0;
+        for(int i = 0; i < getMaxHandSize(); i++) {
+            if(listA.get(i).isLand()) {
+                landsA++;
+            }
+        }
+        float listALandRadio = (float)landsA / getMaxHandSize();
+
+        int landsB = 0;
+        for(int i = 0; i < getMaxHandSize(); i++) {
+            if(listB.get(i).isLand()) {
+                landsB++;
+            }
+        }
+        float listBLandRadio = (float)landsB / getMaxHandSize();
+
+        System.err.println("landsA:" + landsA + " landsB:" + landsB + " deck:" + deckLandRadio * 100.0f + "%");
+
+        if(Math.abs(listALandRadio - deckLandRadio) <= Math.abs(listBLandRadio - deckLandRadio)) {
+            System.err.println("Choose listA");
+            getZone(ZoneType.Library).setCards(listA);
+        } else {
+            System.err.println("Choose listB");
+            getZone(ZoneType.Library).setCards(listB);
+        }
+
+        // Run triggers
+        final Map<AbilityKey, Object> runParams = AbilityKey.newMap();
+        runParams.put(AbilityKey.Player, this);
+        runParams.put(AbilityKey.Source, sa);
+        game.getTriggerHandler().runTrigger(TriggerType.Shuffled, runParams, false);
+
+        // Play the shuffle sound
+        game.fireEvent(new GameEventShuffle(this));
+    }
+
     public final void shuffle(final SpellAbility sa) {
         final CardCollection list = new CardCollection(getCardsIn(ZoneType.Library));
 
@@ -1681,8 +1760,7 @@ public class Player extends GameEntity implements Comparable<Player> {
             return;
         }
 
-        // Note: Shuffling once is sufficient.
-        Collections.shuffle(list, MyRandom.getRandom());
+        shuffleCards(list);
 
         getZone(ZoneType.Library).setCards(getController().cheatShuffle(list));
 
@@ -2814,6 +2892,7 @@ public class Player extends GameEntity implements Comparable<Player> {
             mayBePlayedAbility += " | MayPlayIgnoreColor$ True";
         }
         eff.addStaticAbility(mayBePlayedAbility);
+        eff.getCurrentState().setImageKey(commander.getImageKey());
         return eff;
     }
 
