@@ -2,15 +2,15 @@ package forge.interfaces;
 
 public interface IDevModeCheats {
 
-    void setCanPlayUnlimitedLands(boolean canPlayUnlimitedLands0);
+    void setCanPlayUnlimited(boolean canPlayUnlimited);
 
     void setViewAllCards(boolean canViewAll);
 
     void generateMana(boolean empty);
 
-    void dumpGameState();
+    void dumpGameState(boolean quick);
 
-    void setupGameState();
+    void setupGameState(boolean lastState);
 
     void tutorForCard(boolean sideboard);
 
@@ -75,7 +75,7 @@ public interface IDevModeCheats {
         public void tapPermanents(boolean all) {
         }
         @Override
-        public void setupGameState() {
+        public void setupGameState(boolean lastState) {
         }
         @Override
         public void setViewAllCards(final boolean canViewAll) {
@@ -84,7 +84,7 @@ public interface IDevModeCheats {
         public void setPlayerLife(boolean maxLife) {
         }
         @Override
-        public void setCanPlayUnlimitedLands(final boolean canPlayUnlimitedLands0) {
+        public void setCanPlayUnlimited(final boolean canPlayUnlimited) {
         }
         @Override
         public void riggedPlanarRoll() {
@@ -96,7 +96,7 @@ public interface IDevModeCheats {
         public void generateMana(boolean empty) {
         }
         @Override
-        public void dumpGameState() {
+        public void dumpGameState(boolean quick) {
         }
         @Override
         public void addCountersToPermanent(boolean player) {

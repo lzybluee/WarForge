@@ -20,7 +20,7 @@ import forge.screens.match.views.IDevListener;
 public class DevModeMenu implements ActionListener, IDevListener {
 
     private CDev controller;
-    private JCheckBoxMenuItem playUnlimitedLands = null, viewAll = null;
+    private JCheckBoxMenuItem playUnlimited = null, viewAll = null;
     public DevModeMenu(final CDev controller) {
         this.controller = controller;
         controller.addListener(this);
@@ -39,7 +39,7 @@ public class DevModeMenu implements ActionListener, IDevListener {
         WIN_GAME("Win Game"),
         SETUP_GAME_STATE("Setup Game State"),
         DUMP_GAME_STATE("Dump Game State"),
-        PLAY_UNLIMITED_LANDS("Play Unlimited Lands"),
+        PLAY_UNLIMITED_LANDS("Play Unlimited"),
         VIEW_ALL("View All Cards"),
         ADD_COUNTER("Add Counters to Permanent"),
         TAP_PERMANENT("Tap Permanents"),
@@ -63,9 +63,9 @@ public class DevModeMenu implements ActionListener, IDevListener {
     }
 
     @Override
-    public void update(final boolean playUnlimitedLands, final boolean mayViewAllCards) {
-        if (this.playUnlimitedLands != null && this.viewAll != null) {
-            this.playUnlimitedLands.setSelected(playUnlimitedLands);
+    public void update(final boolean playUnlimited, final boolean mayViewAllCards) {
+        if (this.playUnlimited != null && this.viewAll != null) {
+            this.playUnlimited.setSelected(playUnlimited);
             this.viewAll.setSelected(mayViewAllCards);
         }
     }
@@ -87,7 +87,7 @@ public class DevModeMenu implements ActionListener, IDevListener {
         menu.add(getMenuItem(DevMenuItem.SETUP_GAME_STATE));
         menu.add(getMenuItem(DevMenuItem.DUMP_GAME_STATE));
         menu.addSeparator();
-        menu.add(playUnlimitedLands = getCheckboxMenuItem(DevMenuItem.PLAY_UNLIMITED_LANDS));
+        menu.add(playUnlimited = getCheckboxMenuItem(DevMenuItem.PLAY_UNLIMITED_LANDS));
         menu.add(viewAll = getCheckboxMenuItem(DevMenuItem.VIEW_ALL));
         menu.add(getMenuItem(DevMenuItem.ADD_COUNTER));
         menu.addSeparator();
@@ -127,9 +127,9 @@ public class DevModeMenu implements ActionListener, IDevListener {
         case EXILE_FROM_HAND:	   { controller.exileCardsFromHand(); break; }
         case SET_PLAYER_LIFE:      { controller.setPlayerLife(false); break; }
         case WIN_GAME:             { controller.winGame(false); break; }
-        case SETUP_GAME_STATE:     { controller.setupGameState(); break; }
-        case DUMP_GAME_STATE:      { controller.dumpGameState(); break; }
-        case PLAY_UNLIMITED_LANDS: { controller.togglePlayManyLandsPerTurn(); break; }
+        case SETUP_GAME_STATE:     { controller.setupGameState(false); break; }
+        case DUMP_GAME_STATE:      { controller.dumpGameState(false); break; }
+        case PLAY_UNLIMITED_LANDS: { controller.togglePlayUnlimited(); break; }
         case VIEW_ALL:             { controller.toggleViewAllCards(); break; }
         case ADD_COUNTER:          { controller.addCounterToPermanent(false); break; }
         case TAP_PERMANENT:        { controller.tapPermanent(false); break; }

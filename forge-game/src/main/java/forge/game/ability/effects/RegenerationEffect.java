@@ -25,10 +25,19 @@ public class RegenerationEffect extends SpellAbilityEffect {
                 continue;
             }
 
+            boolean frozen = game.getTracker().isFrozen();
+            if(frozen) {
+            	game.getTracker().unfreeze();
+            }
+
             c.setDamage(0);
             c.setHasBeenDealtDeathtouchDamage(false);
             c.tap();
             c.addRegeneratedThisTurn();
+
+            if(frozen) {
+            	game.getTracker().freeze();
+            }
 
             if (game.getCombat() != null) {
                 game.getCombat().removeFromCombat(c);

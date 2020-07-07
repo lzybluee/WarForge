@@ -266,7 +266,7 @@ public abstract class PlayerController {
     	return false;
     }
 
-    public boolean canPlayUnlimitedLands() {
+    public boolean canPlayUnlimited() {
         return false;
     }
 

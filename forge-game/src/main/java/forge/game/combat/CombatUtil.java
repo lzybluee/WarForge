@@ -174,10 +174,11 @@ public class CombatUtil {
 
         // Basic checks (unless is for next turn)
         if (!forNextTurn && (
-                   !attacker.isCreature()
-                || attacker.isTapped() || attacker.isPhasedOut()
-                || (attacker.hasSickness() && !attacker.hasKeyword("CARDNAME can attack as though it had haste."))
-                || game.getPhaseHandler().getPhase().isAfter(PhaseType.COMBAT_DECLARE_ATTACKERS))) {
+                !attacker.isCreature()
+             || attacker.isTapped() || attacker.isPhasedOut()
+             || (attacker.hasSickness() && !attacker.hasKeyword("CARDNAME can attack as though it had haste.")
+             		&& !attacker.getController().getController().canPlayUnlimited())
+             || game.getPhaseHandler().getPhase().isAfter(PhaseType.COMBAT_DECLARE_ATTACKERS))) {
             return false;
         }
 

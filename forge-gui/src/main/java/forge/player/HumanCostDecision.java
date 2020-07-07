@@ -173,7 +173,9 @@ public class HumanCostDecision extends CostDecisionMakerBase {
                 c = AbilityUtils.calculateAmount(source, amount, ability);
             }
         }
-
+        if (c == 0) {
+            return PaymentDecision.card(new CardCollection());
+        }
         final InputSelectCardsFromList inp = new InputSelectCardsFromList(controller, c, c, hand, ability);
         inp.setMessage("Select %d more " + cost.getDescriptiveType() + " to discard.");
         inp.setCancelAllowed(true);

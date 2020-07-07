@@ -365,7 +365,8 @@ public class PhaseHandler implements java.io.Serializable {
                     // Rule 514.1
                     final int handSize = playerTurn.getZone(ZoneType.Hand).size();
                     final int max = playerTurn.getMaxHandSize();
-                    int numDiscard = playerTurn.isUnlimitedHandSize() || handSize <= max || handSize == 0 ? 0 : handSize - max;
+                    int numDiscard = playerTurn.isUnlimitedHandSize() || playerTurn.getController().canPlayUnlimited()
+                    		|| handSize <= max || handSize == 0 ? 0 : handSize - max;
 
                     if (numDiscard > 0) {
                     	CardCollection discarded = new CardCollection();
@@ -520,6 +521,11 @@ public class PhaseHandler implements java.io.Serializable {
                 }
 
                 whoDeclares.getController().declareAttackers(playerTurn, combat);
+                
+                if(combat == null) {
+                	return;
+                }
+
                 combat.removeAbsentCombatants();
 
                 success = CombatUtil.validateAttackers(combat);
@@ -620,6 +626,10 @@ public class PhaseHandler implements java.io.Serializable {
 
             if (game.isGameOver()) { // they just like to close window at any moment
                 return;
+            }
+
+            if(combat == null) {
+            	return;
             }
 
             // Handles removing cards like Mogg Flunkies from combat if group block

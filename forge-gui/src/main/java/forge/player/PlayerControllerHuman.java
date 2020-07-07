@@ -91,6 +91,8 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
     protected final InputQueue inputQueue;
     protected final InputProxy inputProxy;
 
+    private static String lastStateFileName;
+
     public PlayerControllerHuman(final Game game0, final Player p, final LobbyPlayer lp) {
         super(game0, p, lp);
         inputProxy = new InputProxy(this);
@@ -578,6 +580,12 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
      */
     @Override
     public boolean confirmAction(final SpellAbility sa, final PlayerActionConfirmMode mode, final String message) {
+    	if (sa != null && sa.getApi() == ApiType.SetState) {
+    		final String cardName = sa.getHostCard() == null ? null : sa.getHostCard().getName();
+            if (getGui().shouldAutoYieldCard(cardName)) {
+        		return false;
+            }
+    	}
         if (sa != null && sa.getHostCard() != null && sa.hasParam("ShowCardInPrompt")) {
             // The card wants another thing displayed in the prompt on mouse over rather than itself
             Card show = null;
@@ -1651,7 +1659,35 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
     private final Map<String, Long> orderedSALookupTimestamp = Maps.newHashMap();
 
     @Override
-    public void orderAndPlaySimultaneousSa(final List<SpellAbility> activePlayerSAs) {
+    public void orderAndPlaySimultaneousSa(final List<SpellAbility> sas) {
+    	List<SpellAbility> perCardList = Lists.newArrayList();
+    	HashMap<Card, List<SpellAbility>> perCardmap = Maps.newHashMap();
+    	List<SpellAbility> noHostList = Lists.newArrayList();
+    	for(SpellAbility sa : sas) {
+    		Card host = sa.getHostCard();
+    		if(host != null) {
+    			if(!perCardmap.containsKey(host)) {
+    				perCardmap.put(host, Lists.newArrayList());
+    			}
+    			perCardmap.get(host).add(sa);
+    		} else {
+    			noHostList.add(sa);
+    		}
+    	}
+    	for(Map.Entry<Card, List<SpellAbility>> entry : perCardmap.entrySet()) {
+    		perCardList.addAll(entry.getValue());
+    	}
+    	perCardList.addAll(noHostList);
+
+    	List<SpellAbility> activePlayerSAs = Lists.newArrayList();
+    	for(SpellAbility sa : perCardList) {
+    		if(sa.getApi() != null && (sa.getApi() == ApiType.Untap || sa.getApi() == ApiType.Token)) {
+    			activePlayerSAs.add(sa);
+    		}
+    	}
+    	perCardList.removeAll(activePlayerSAs);
+    	activePlayerSAs.addAll(perCardList);
+
         List<SpellAbility> orderedSAs = activePlayerSAs;
         if (activePlayerSAs.size() > 1) {
             final String firstStr = activePlayerSAs.get(0).toString();
@@ -2011,11 +2047,11 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
     }
 
     // Dev Mode cheat functions
-    private boolean canPlayUnlimitedLands;
+    private boolean canPlayUnlimited;
 
     @Override
-    public boolean canPlayUnlimitedLands() {
-        return canPlayUnlimitedLands;
+    public boolean canPlayUnlimited() {
+        return canPlayUnlimited;
     }
 
     private IDevModeCheats cheats;
@@ -2049,11 +2085,11 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         /*
          * (non-Javadoc)
          * 
-         * @see forge.player.IDevModeCheats#setCanPlayUnlimitedLands(boolean)
+         * @see forge.player.IDevModeCheats#setCanPlayUnlimited(boolean)
          */
         @Override
-        public void setCanPlayUnlimitedLands(final boolean canPlayUnlimitedLands0) {
-            canPlayUnlimitedLands = canPlayUnlimitedLands0;
+        public void setCanPlayUnlimited(final boolean canPlayUnlimited0) {
+            canPlayUnlimited = canPlayUnlimited0;
         }
 
         /*
@@ -2114,7 +2150,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
          * @see forge.player.IDevModeCheats#dumpGameState()
          */
         @Override
-        public void dumpGameState() {
+        public void dumpGameState(boolean quick) {
             final GameState state = createGameStateObject();
             try {
                 state.initFromGame(game);
@@ -2122,12 +2158,21 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
                 if(!dir.exists()) {
                     dir.mkdirs();
                 }
-                final File f = GuiBase.getInterface().getSaveFile(new File(ForgeConstants.USER_GAMES_DIR, "state.txt"));
-                if (f != null
-                        && (!f.exists() || getGui().showConfirmDialog("Overwrite existing file?", "File exists!"))) {
-                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
-                        bw.write(state.toString());
-                    }
+                File f = null;
+                if(quick) {
+                	f = new File(dir + File.separator + "state_quick.txt");
+                } else {
+                	f = GuiBase.getInterface().getSaveFile(new File(ForgeConstants.USER_GAMES_DIR, "state.txt"));
+                	if(f == null) {
+                		return;
+                	}
+                }
+                if (quick || (f != null
+                        && (!f.exists() || getGui().showConfirmDialog("Overwrite existing file?", "File exists!")))) {
+                	lastStateFileName = f.getAbsolutePath();
+                    final BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+                    bw.write(state.toString());
+                    bw.close();
                 }
             } catch (final Exception e) {
                 String err = e.getClass().getName();
@@ -2145,18 +2190,36 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
          * @see forge.player.IDevModeCheats#setupGameState()
          */
         @Override
-        public void setupGameState() {
+        public void setupGameState(boolean lastState) {
             final File gamesDir = new File(ForgeConstants.USER_GAMES_DIR);
             if (!gamesDir.exists()) {
                 // if the directory does not exist, try to create it
                 gamesDir.mkdir();
             }
 
-            final String filename = GuiBase.getInterface().showFileDialog("Select Game State File",
-                    ForgeConstants.USER_GAMES_DIR);
+            String filename = null;
+            if(lastState) {
+                if(lastStateFileName == null) {
+                	String name = gamesDir + File.separator + "state_quick.txt";
+            		File file = new File(name);
+            		if(file.exists()) {
+            			filename = name;
+            		}
+                } else {
+                	File file = new File(lastStateFileName);
+                	if(file.exists()) {
+                		filename = lastStateFileName;
+                	}
+                }
+            }
+        	if(filename == null) {
+        		filename = GuiBase.getInterface().showFileDialog("Select Game State File",
+                        ForgeConstants.USER_GAMES_DIR);
+        	}
             if (filename == null) {
                 return;
             }
+            lastStateFileName = filename;
 
             final GameState state = createGameStateObject();
             try {

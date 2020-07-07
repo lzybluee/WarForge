@@ -489,10 +489,10 @@ public class PlayerView extends GameEntityView {
         }
 
         if (getIsExtraTurn()) {
-            details.add("Extra Turn: Yes");
+            details.add("Extra turn now: Yes");
         }
         if (getExtraTurnCount() > 0) {
-            details.add(TextUtil.concatWithSpace("Extra Turn Count:", String.valueOf(getExtraTurnCount())));
+            details.add(TextUtil.concatWithSpace("Extra turns count:", String.valueOf(getExtraTurnCount())));
         }
         final String keywords = Lang.joinHomogenous(getDisplayableKeywords());
         if (!keywords.isEmpty()) {

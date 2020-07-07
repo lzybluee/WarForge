@@ -7,6 +7,7 @@ import forge.ai.ability.AnimateAi;
 import forge.card.ColorSet;
 import forge.game.Game;
 import forge.game.ability.AbilityUtils;
+import forge.game.ability.ApiType;
 import forge.game.card.*;
 import forge.game.card.CardPredicates.Presets;
 import forge.game.combat.Combat;
@@ -145,7 +146,7 @@ public class ComputerUtilCost {
                 final CostDiscard disc = (CostDiscard) part;
 
                 final String type = disc.getType();
-                if (type.equals("CARDNAME") && source.getAbilityText().contains("Bloodrush")) {
+                if (type.equals("CARDNAME") && source.getAbilityText().contains("Bloodrush —")) {
                     continue;
                 }
                 final CardCollection typeList = CardLists.getValidCards(hand, type.split(","), source.getController(), source, null);
@@ -468,7 +469,7 @@ public class ComputerUtilCost {
                         continue;
 
                     try {
-                        extraManaNeeded += Integer.parseInt(snem);
+                    	extraManaNeeded += Integer.parseInt(parts.length > 1 ? parts[0] : snem);
                     } catch (final NumberFormatException e) {
                         System.out.println("wrong SpellsNeedExtraMana SVar format on " + c);
                     }
@@ -628,6 +629,20 @@ public class ComputerUtilCost {
         // AI will only pay when it's not already payed and only opponents abilities
         if (alreadyPaid || (payers.size() > 1 && (isMine && !payForOwnOnly))) {
             return false;
+        }
+
+        if(sa.getApi() == ApiType.LoseLife && sa.hasParam("LifeAmount")) {
+        	if(!payer.canLoseLife()) {
+        		return false;
+        	}
+            for (final CostPart part : cost.getCostParts()) {
+            	if(part instanceof CostDiscard || part instanceof CostSacrifice) {
+                	int loss = AbilityUtils.calculateAmount(sa.getHostCard(), sa.getParam("LifeAmount"), sa);
+                	if(payer.getLife() - loss >= 6) {
+                		return false;
+                	}
+            	}
+            }
         }
 
         // AI was crashing because the blank ability used to pay costs

@@ -1203,6 +1203,9 @@ public class CardFactoryUtil {
         if (sq[0].contains("CardToughness")) {
             return doXMath(c.getNetToughness(), m, c);
         }
+        if (sq[0].contains("CardLoyalty")) {
+            return doXMath(c.getCurrentLoyalty(), m, c);
+        }
         if (sq[0].contains("CardSumPT")) {
             return doXMath((c.getNetPower() + c.getNetToughness()), m, c);
         }
@@ -2674,7 +2677,9 @@ public class CardFactoryUtil {
             final Trigger changeZoneTrigger = TriggerHandler.parseTrigger("Mode$ ChangesZone | ValidCard$ Card.IsRemembered | Origin$ Exile | Destination$ Any | TriggerZone$ Command | Execute$ DBHideawayCleanup | Static$ True", card, intrinsic);
             triggers.add(changeZoneTrigger);
             card.setSVar("DBHideawayRemember", "DB$ Animate | Defined$ Imprinted | RememberObjects$ Remembered | Permanent$ True");
-            card.setSVar("DBHideawayCleanup", "DB$ Cleanup | ClearRemembered$ True");
+            card.setSVar("DBHideawayCleanup", "DB$ Cleanup | ClearRemembered$ True | ClearImprinted$ True");
+            final Trigger selfChangeZoneTrigger = TriggerHandler.parseTrigger("Mode$ ChangesZone | ValidCard$ Card.Self | Origin$ Battlefield | Destination$ Any | TriggerZone$ Battlefield | Execute$ DBHideawayCleanup | Static$ True", card, intrinsic);
+            triggers.add(selfChangeZoneTrigger);
             
             for (final Trigger trigger : triggers) {
                 inst.addTrigger(trigger);
@@ -3521,7 +3526,7 @@ public class CardFactoryUtil {
 
             String abExile = "DB$ ChangeZone | Defined$ Self | Origin$ Stack | Destination$ Exile";
             String delTrig = "DB$ DelayedTrigger | Mode$ Phase | Phase$ Upkeep | ValidPlayer$ You " + 
-            " | OptionalDecider$ You | RememberObjects$ Self | TriggerDescription$"
+            " | RememberObjects$ Self | TriggerDescription$"
             + " At the beginning of your next upkeep, you may cast " + card.toString() + " without paying its mana cost.";
             // TODO add check for still in exile
             String abPlay = "DB$ Play | Defined$ Self | WithoutManaCost$ True | Optional$ True";
