@@ -360,7 +360,10 @@ public abstract class InputPayMana extends InputSyncronizedBase {
             ArrayList<SpellAbilityView> choices = new ArrayList<>(abilitiesMap.keySet());
             if(abilitiesMap.size() > 1) {
                 if(choice) {
-                    chosen = abilitiesMap.get(getController().getGui().one("Choose mana ability",  choices));
+                    chosen = abilitiesMap.get(getController().getGui().getAbilityToPlay(card.getView(), choices, triggerEvent));
+                    if(chosen == null) {
+                    	return false;
+                    }
                 } else {
                     if(abilitiesMap.containsValue(priorAbility)) {
                         chosen = priorAbility;
