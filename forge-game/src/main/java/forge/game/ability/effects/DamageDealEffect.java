@@ -14,6 +14,7 @@ import forge.game.player.Player;
 import forge.game.spellability.SpellAbility;
 import forge.util.Lang;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -95,6 +96,8 @@ public class DamageDealEffect extends DamageBaseEffect {
         final boolean divideOnResolution = sa.hasParam("DividerOnResolution");
 
         List<GameObject> tgts = getTargets(sa);
+        List<GameObject> radianceTgts = new ArrayList<>();
+
         if (sa.hasParam("OptionalDecider")) {
             Player decider = Iterables.getFirst(AbilityUtils.getDefinedPlayers(hostCard, sa.getParam("OptionalDecider"), sa), null);
             if (decider != null && !decider.getController().confirmAction(sa, null, "Do you want to deal " + dmg + " damage to " + tgts + " ?")) {
@@ -122,8 +125,11 @@ public class DamageDealEffect extends DamageBaseEffect {
             }
             // Can't radiate from a player
             if (origin != null) {
-                tgts.addAll(CardUtil.getRadiance(hostCard, origin,
-                        sa.getParam("ValidTgts").split(",")));
+            	for (final Card c : CardUtil.getRadiance(hostCard, origin,
+                        sa.getParam("ValidTgts").split(","))) {
+                    tgts.add(c);
+                    radianceTgts.add(c);
+                }
             }
         }
 
@@ -203,7 +209,12 @@ public class DamageDealEffect extends DamageBaseEffect {
                         // timestamp different or not in play
                         continue;
                     }
-                    if (!targeted || c.canBeTargetedBy(sa)) {
+                    boolean skipTargatCheck = false;
+                    if(radianceTgts.contains(c)) {
+                    	skipTargatCheck = true;
+                    	radianceTgts.remove(c);
+                    }
+                    if (!targeted || skipTargatCheck || c.canBeTargetedBy(sa)) {
                         if (removeDamage) {
                             c.setDamage(0);
                             c.setHasBeenDealtDeathtouchDamage(false);
