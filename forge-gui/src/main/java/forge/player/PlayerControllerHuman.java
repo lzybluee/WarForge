@@ -251,7 +251,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         List<PaperCard> newMain = null;
 
         // Skip sideboard loop if there are no sideboarding opportunities
-        if (sbSize == 0 && mainSize == deckMinSize) {
+        if (sbSize == 0 && (mainSize == deckMinSize || (deckMinSize == 0 && (mainSize == 60 || mainSize == 40)))) {
             return null;
         }
 
@@ -643,6 +643,17 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         if (getGui().shouldAutoYieldCard(cardName)) {
             return true;
         }
+        if(!FModel.getPreferences().getPrefBoolean(FPref.UI_SKIP_AUTO_PAY)) {
+	    	if (sa != null && sa.hasParam("Graft") && !sa.getTriggeringObjects().isEmpty()) {
+	    		final Map<AbilityKey, Object> objs = sa.getTriggeringObjects();
+	    		if (objs.containsKey(AbilityKey.Card)) {
+	                final Card card = (Card) objs.get(AbilityKey.Card);
+	                if(sa.getActivatingPlayer() != card.getController()) {
+	                	return false;
+	                }
+	    		}
+	    	}
+        }
 
         // triggers with costs can always be declined by not paying the cost
         if (sa.hasParam("Cost") && !sa.getParam("Cost").equals("0")) {
@@ -789,30 +800,38 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         tempShowCards(topN);
 	if ( FModel.getPreferences().getPrefBoolean(FPref.UI_SELECT_FROM_CARD_DISPLAYS) &&
 	     (!GuiBase.getInterface().isLibgdxPort()) ) {
-	    CardCollectionView cardList = player.getCardsIn(ZoneType.Library);
-	    ImmutablePair<CardCollection, CardCollection> result =
-		arrangeForMove("Move cards to top or bottom of library", cardList, topN, true, true);
-	    toTop = result.getLeft();
-	    toBottom = result.getRight();
+		if(topN.size() == 1) {
+			if (willPutCardOnTop(topN.get(0))) {
+			    toTop = topN;
+			} else {
+			    toBottom = topN;
+			}
+		} else {
+		    CardCollectionView cardList = player.getCardsIn(ZoneType.Library);
+		    ImmutablePair<CardCollection, CardCollection> result =
+			arrangeForMove("Move cards to top or bottom of library", cardList, topN, true, true);
+		    toTop = result.getLeft();
+		    toBottom = result.getRight();
+		}
 	} else {
 	    if (topN.size() == 1) {
-		if (willPutCardOnTop(topN.get(0))) {
-		    toTop = topN;
-		} else {
-		    toBottom = topN;
-		}
+			if (willPutCardOnTop(topN.get(0))) {
+			    toTop = topN;
+			} else {
+			    toBottom = topN;
+			}
 	    } else {
-		toBottom = game.getCardList(getGui().many("Select cards to be put on the bottom of your library",
-							  "Cards to put on the bottom", -1, CardView.getCollection(topN), null));
-		topN.removeAll(toBottom);
-		if (topN.isEmpty()) {
-		    toTop = null;
-		} else if (topN.size() == 1) {
-		    toTop = topN;
-		} else {
-		    toTop = game.getCardList(getGui().order("Arrange cards to be put on top of your library",
-							    "Top of Library", CardView.getCollection(topN), null));
-		}
+			toBottom = game.getCardList(getGui().many("Select cards to be put on the bottom of your library",
+								  "Cards to put on the bottom", -1, CardView.getCollection(topN), null));
+			topN.removeAll(toBottom);
+			if (topN.isEmpty()) {
+			    toTop = null;
+			} else if (topN.size() == 1) {
+			    toTop = topN;
+			} else {
+			    toTop = game.getCardList(getGui().order("Arrange cards to be put on top of your library",
+								    "Top of Library", CardView.getCollection(topN), null));
+			}
 	    }
 	}
         endTempShowCards();
@@ -994,7 +1013,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         final TargetChoices oldTarget = sa.getTargets();
         final TargetSelection select = new TargetSelection(this, sa);
         sa.resetTargets();
-        if (select.chooseTargets(oldTarget.getNumTargeted())) {
+        if (select.chooseTargets(oldTarget.getNumTargeted(), true)) {
             return sa.getTargets();
         } else {
             // Return old target, since we had to reset them above
@@ -1305,8 +1324,19 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         } else {
             final SpellAbility ability = stack.peekAbility();
             final String cardName = ability.getHostCard() == null ? null : ability.getHostCard().getName();
-            if (ability != null && ability.isAbility() &&
-            		(getGui().shouldAutoYieldCard(cardName) || getGui().shouldAutoYield(ability.yieldKey()))) {
+            boolean shouldAutoYield = getGui().shouldAutoYieldCard(cardName)  || getGui().shouldAutoYield(ability.yieldKey());
+            if(!shouldAutoYield && !FModel.getPreferences().getPrefBoolean(FPref.UI_SKIP_AUTO_PAY)) {
+            	if (ability != null && ability.hasParam("Graft") && !ability.getTriggeringObjects().isEmpty()) {
+            		final Map<AbilityKey, Object> objs = ability.getTriggeringObjects();
+            		if (objs.containsKey(AbilityKey.Card)) {
+                        final Card card = (Card) objs.get(AbilityKey.Card);
+                        if(ability.getActivatingPlayer() != card.getController()) {
+                        	shouldAutoYield = true;
+                        }
+            		}
+            	}
+            }
+            if (ability != null && ability.isAbility() && shouldAutoYield) {
                 // avoid prompt for input if top ability of stack is set to
                 // auto-yield
                 try {
@@ -1324,8 +1354,9 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
     }
 
     @Override
-    public void playChosenSpellAbility(final SpellAbility chosenSa) {
+    public boolean playChosenSpellAbility(final SpellAbility chosenSa) {
         HumanPlay.playSpellAbility(this, player, chosenSa);
+        return true;
     }
 
     @Override

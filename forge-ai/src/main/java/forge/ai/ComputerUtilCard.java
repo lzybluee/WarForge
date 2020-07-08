@@ -363,8 +363,10 @@ public class ComputerUtilCard {
         }
     
         List<Card> lands = CardLists.filter(list, CardPredicates.Presets.LANDS);
-        if (lands.size() > 6) {
-            return ComputerUtilCard.getWorstLand(lands);
+        if (!lands.isEmpty()) {
+        	if (lands.size() > 3) {
+                return ComputerUtilCard.getWorstLand(lands);
+        	}
         }
     
         if (hasEnchantmants || hasArtifacts) {
@@ -378,7 +380,11 @@ public class ComputerUtilCard {
         }
     
         if (hasCreatures) {
-            return getWorstCreatureAI(CardLists.filter(list, CardPredicates.Presets.CREATURES));
+        	CardCollection creatures = CardLists.filter(list, CardPredicates.Presets.CREATURES);
+        	Card creature = getWorstCreatureAI(creatures);
+        	if(creatures.size() > 3 || creature.getManaCost().getCMC() < 3) {
+        		return creature;
+        	}
         }
     
         // Planeswalkers fall through to here, lands will fall through if there

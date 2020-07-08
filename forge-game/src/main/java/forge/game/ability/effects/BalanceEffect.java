@@ -12,6 +12,7 @@ import forge.game.zone.ZoneType;
 import forge.util.collect.FCollectionView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /** 
@@ -41,7 +42,10 @@ public class BalanceEffect extends SpellAbilityEffect {
             validCards.add(CardLists.getValidCards(players.get(i).getCardsIn(zone), valid, activator, source));
             min = Math.min(min, validCards.get(i).size());
         }
-        
+
+        final List<Card> discarded = new ArrayList<Card>();
+        final List<Player> discarders = new ArrayList<Player>();
+
         CardZoneTable table = new CardZoneTable();
         for(int i = 0; i < players.size(); i++) {
             Player p = players.get(i);
@@ -53,6 +57,10 @@ public class BalanceEffect extends SpellAbilityEffect {
                 for (Card card : p.getController().chooseCardsToDiscardFrom(p, sa, validCards.get(i), numToBalance, numToBalance)) {
                     if ( null == card ) continue;
                     p.discard(card, sa, table);
+                    discarded.add(card);
+                    if(!discarders.contains(p)) {
+                    	discarders.add(p);
+                    }
                 }
             } else { // Battlefield
                 // TODO: "can'e be sacrificed"
@@ -63,5 +71,20 @@ public class BalanceEffect extends SpellAbilityEffect {
             }
         }
         table.triggerChangesZoneAll(game);
+
+        HashMap<Player, CardCollection> revealCards = new HashMap<Player, CardCollection>();
+        for(Card c : discarded) {
+            Player p = c.getOwner();
+            if(!revealCards.containsKey(p)) {
+                revealCards.put(p, new CardCollection());
+            }
+            revealCards.get(c.getOwner()).add(c);
+        }
+
+        for(Player p : discarders) {
+            if(revealCards.containsKey(p)) {
+                p.getGame().getAction().reveal(revealCards.get(p), p, true);
+            }
+        }
     }
 }

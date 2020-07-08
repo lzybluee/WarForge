@@ -1014,13 +1014,16 @@ public class PhaseHandler implements java.io.Serializable {
                     if (DEBUG_PHASES) {
                         System.out.print("... " + pPlayerPriority + " plays " + chosenSa);
                     }
+                    Player lastPriority = pFirstPriority;
                     pFirstPriority = pPlayerPriority; // all opponents have to pass before stack is allowed to resolve
+                    boolean pass = true;
                     for (SpellAbility sa : chosenSa) {
                         Card saHost = sa.getHostCard();
                         final Zone originZone = saHost.getZone();
 
                         // TODO it has no return value if successful
-                        pPlayerPriority.getController().playChosenSpellAbility(sa);
+                        if(pPlayerPriority.getController().playChosenSpellAbility(sa))
+                        	pass = false;
 
                         saHost = game.getCardState(saHost);
                         final Zone currentZone = saHost.getZone();
@@ -1032,7 +1035,10 @@ public class PhaseHandler implements java.io.Serializable {
                             triggerList.put(originZone.getZoneType(), currentZone.getZoneType(), saHost);
                             triggerList.triggerChangesZoneAll(game);
                         }
-                        
+                    }
+                    if (pass) {
+                    	pFirstPriority = lastPriority;
+                        break; // that means 'I pass'
                     }
                     loopCount++;
                 } while (loopCount < 999 || !pPlayerPriority.getController().isAI());

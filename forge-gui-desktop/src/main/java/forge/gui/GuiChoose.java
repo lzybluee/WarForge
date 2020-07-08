@@ -28,6 +28,7 @@ import forge.game.replacement.ReplacementEffect;
 import forge.game.spellability.SpellAbilityView;
 import forge.game.spellability.StackItemView;
 import forge.game.trigger.WrappedAbility;
+import forge.game.zone.ZoneType;
 import forge.item.IPaperCard;
 import forge.item.InventoryItem;
 import forge.item.PaperCard;
@@ -224,7 +225,12 @@ public class GuiChoose {
                             	return;
                             }
 
-                            matchUI.setCard(card);
+                            if(card.getZone() == ZoneType.Library) {
+                            	matchUI.setPaperCard(card);
+                            } else {
+                                matchUI.setCard(card);
+                            }
+
                             matchUI.clearPanelSelections();
                             matchUI.setPanelSelection(card);
                         }

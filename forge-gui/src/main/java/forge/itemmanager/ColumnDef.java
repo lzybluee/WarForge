@@ -385,7 +385,8 @@ public enum ColumnDef {
             new Function<Entry<InventoryItem, Integer>, Comparable<?>>() {
                 @Override
                 public Comparable<?> apply(final Entry<InventoryItem, Integer> from) {
-                    return toDeck(from.getKey()).getEdition();
+                	CardEdition edition = toDeck(from.getKey()).getEdition();
+                    return edition == null ? "" : edition.getCode();
                 }
             },
             new Function<Entry<? extends InventoryItem, Integer>, Object>() {

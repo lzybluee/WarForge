@@ -2548,7 +2548,7 @@ public class CardFactoryUtil {
         } else if (keyword.startsWith("Graft")) {
             final StringBuilder sb = new StringBuilder();
             sb.append("DB$ MoveCounter | Source$ Self | Defined$ TriggeredCardLKICopy");
-            sb.append(" | CounterType$ P1P1 | CounterNum$ 1");
+            sb.append(" | CounterType$ P1P1 | CounterNum$ 1 | Graft$ True");
 
             if (card.hasSVar("AIGraftPreference")) {
                 sb.append(" | AILogic$ ").append(card.getSVar("AIGraftPreference"));

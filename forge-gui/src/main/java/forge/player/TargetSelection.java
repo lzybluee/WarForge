@@ -64,6 +64,10 @@ public class TargetSelection {
     private boolean bTargetingDone = false;
 
     public final boolean chooseTargets(Integer numTargets) {
+    	return chooseTargets(numTargets, false);
+    }
+
+    public final boolean chooseTargets(Integer numTargets, boolean changeTargets) {
         final TargetRestrictions tgt = getTgt();
         final boolean canTarget = tgt != null && tgt.doesTarget();
         if (!canTarget) {
@@ -153,7 +157,8 @@ public class TargetSelection {
                 playersWithValidTargets.put(PlayerView.get(card.getController()), null);
             }
             if (controller.getGui().openZones(zone, playersWithValidTargets)) {
-                InputSelectTargets inp = new InputSelectTargets(controller, validTargets, ability, mandatory);
+                InputSelectTargets inp = new InputSelectTargets(controller, validTargets, ability, mandatory,
+                		minTargets == 0 && maxTargets > 0, changeTargets ? numTargets : -1);
                 inp.showAndWait();
                 choiceResult = !inp.hasCancelled();
                 bTargetingDone = inp.hasPressedOk();
