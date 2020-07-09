@@ -1158,9 +1158,16 @@ public class ChangeZoneEffect extends SpellAbilityEffect {
             }
         }
 
+        boolean revealed = false;
         if (((!ZoneType.Battlefield.equals(destination) && changeType != null && !defined && !changeType.equals("Card"))
                 || (sa.hasParam("Reveal") && !movedCards.isEmpty())) && !sa.hasParam("NoReveal")) {
             game.getAction().reveal(movedCards, player);
+            revealed = true;
+        }
+        
+        if(!revealed && origin.size() == 1 && origin.contains(ZoneType.Hand) && ZoneType.Exile.equals(destination)
+        		&& !movedCards.isEmpty() && !sa.hasParam("ExileFaceDown") && !sa.hasParam("NoReveal")) {
+        	game.getAction().reveal(movedCards, player);
         }
         
         if ((origin.contains(ZoneType.Library) && !destination.equals(ZoneType.Library) && !defined && shuffleMandatory)
