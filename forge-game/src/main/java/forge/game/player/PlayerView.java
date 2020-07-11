@@ -268,7 +268,7 @@ public class PlayerView extends GameEntityView {
         final List<String> allKws;
         final ImmutableMultiset<String> kws = getKeywords();
         synchronized (kws) {
-            allKws = Lists.newArrayList(kws.elementSet());
+            allKws = Lists.newArrayList(kws);
         }
         return allKws;
     }
