@@ -1895,7 +1895,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         List<CardPlayOption> payAltZeroMana = Lists.newArrayList();
         if(!isInZone(ZoneType.Hand) && !isInZone(ZoneType.Command)) {
 	        for (CardPlayOption o : mayPlay.values()) {
-	            if ("0".equals(o.getFormattedAltManaCost().replaceAll("[{}]", ""))) {
+	            if (o.getAltManaCost() != null && "0".equals(o.getFormattedAltManaCost().replaceAll("[{}]", ""))) {
 	            	payAltZeroMana.add(o);
 	            }
 	        }
