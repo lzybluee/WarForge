@@ -558,6 +558,15 @@ public class CardDetailUtil {
             area.append(StringUtils.join(card.getExerted(), ", "));
         }
 
+        //show controller
+        if (card.getOwner() != card.getController()) {
+        	if (area.length() != 0) {
+                area.append("\n\n");
+            }
+        	area.append("[+Gain control from: " + card.getOwner().getName() + "+]");
+            area.append("\n");
+        }
+
         //show current card colors if enabled
         String curCardColors = formatCurrentCardColors(state);
         if (!curCardColors.isEmpty() && !card.isFaceDown()) {
@@ -577,6 +586,7 @@ public class CardDetailUtil {
                 area.append("Current Storm Count: ").append(gameView.getStormCount());
             }
         }
+
         String ret = area.toString();
         while(ret.contains("\n\n\n")) {
         	ret = ret.replace("\n\n\n", "\n\n");
