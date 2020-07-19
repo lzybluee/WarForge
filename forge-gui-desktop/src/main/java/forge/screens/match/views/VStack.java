@@ -160,6 +160,7 @@ public class VStack implements IVDoc<CStack> {
 
         private final StackItemView item;
         private final CachedCardImage cachedImage;
+        private StackInstanceTextArea lastItem;
 
         public StackItemView getItem() {
             return item;
@@ -199,12 +200,15 @@ public class VStack implements IVDoc<CStack> {
             {
             	// set things up to draw an arc from it...
             	hoveredItem = StackInstanceTextArea.this;
-            	controller.getMatchUI().setCard(item.getSourceCard());
+            	controller.getMatchUI().setPaperCard(item.getSourceCard());
             }
 
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(final MouseEvent e) {
+                	if(hoveredItem != null) {
+                		lastItem = hoveredItem;
+                	}
                 	hoveredItem = StackInstanceTextArea.this;
                 	CMatchUI matchUI = controller.getMatchUI();
                     if (matchUI != null) {
@@ -223,7 +227,7 @@ public class VStack implements IVDoc<CStack> {
                         matchUI.clearPanelSelections();
                     }
             		if (hoveredItem == StackInstanceTextArea.this) {
-            			hoveredItem = null;
+            			hoveredItem = lastItem;
             		}
                 }
             });
