@@ -196,6 +196,10 @@ public class HumanPlay {
                     CharmEffect.makeChoices(sa);
                 }
                 sa = AbilityUtils.addSpliceEffects(sa);
+            } else if (sa.isCopied() && !sa.getSVar("CanSelectCharmEffect").isEmpty()) {
+                if (sa.getApi() == ApiType.Charm && !sa.isWrapper()) {
+                    CharmEffect.makeChoices(sa);
+                }
             }
 
             final HumanPlaySpellAbility req = new HumanPlaySpellAbility(controller, sa);
