@@ -856,6 +856,10 @@ public class ChangeZoneEffect extends SpellAbilityEffect {
         String selectPrompt = sa.hasParam("SelectPrompt") ? sa.getParam("SelectPrompt") : MessageUtil.formatMessage("Select a card from {player's} " + Lang.joinHomogenous(origin).toLowerCase(), decider, player);
         final String totalcmc = sa.getParam("WithTotalCMC");
         int totcmc = AbilityUtils.calculateAmount(source, totalcmc, sa);
+        
+        if (sa.hasParam("ForgetOtherRemembered")) {
+        	source.clearRemembered();
+        }
 
         fetchList.sort();
 
