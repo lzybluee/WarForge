@@ -63,6 +63,7 @@ public class TriggerHandler {
     private final ListMultimap<Player, Trigger> playerDefinedDelayedTriggers = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
     private final List<TriggerWaiting> waitingTriggers = Collections.synchronizedList(new ArrayList<>());
     private final Game game;
+    private boolean skipRunWaitingTrigger = false;
 
     public TriggerHandler(final Game gameState) {
         game = gameState;
@@ -363,6 +364,9 @@ public class TriggerHandler {
     }
 
     public final boolean runWaitingTriggers() {
+    	if(skipRunWaitingTrigger) {
+    		return false;
+    	}
         final List<TriggerWaiting> waiting = new ArrayList<>(waitingTriggers);
         waitingTriggers.clear();
         if (waiting.isEmpty()) {
@@ -814,5 +818,9 @@ public class TriggerHandler {
         }
 
         return n;
+    }
+    
+    public void setSkipRunWaitingTrigger(boolean skip) {
+    	skipRunWaitingTrigger = skip;
     }
 }
