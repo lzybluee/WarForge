@@ -864,6 +864,10 @@ public final class CMatchUI
             }
             return null;
         }
+        
+        if(openAbilityMenu != null) {
+        	return null;
+        }
 
         //show menu if mouse was trigger for ability
         final JPopupMenu menu = new JPopupMenu("Abilities");
