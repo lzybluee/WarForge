@@ -366,7 +366,8 @@ public class TriggerHandler {
     public final boolean runWaitingTriggers() {
         final List<TriggerWaiting> waiting = new ArrayList<>();
         for(final TriggerWaiting wt : waitingTriggers) {
-        	if(skipRunZoneChangeTrigger && (wt.getMode() == TriggerType.ChangesZone || wt.getMode() == TriggerType.ChangesZoneAll)) {
+        	if(skipRunZoneChangeTrigger && (wt.getMode() == TriggerType.ChangesZone || wt.getMode() == TriggerType.ChangesZoneAll
+        			 || wt.getMode() == TriggerType.Taps)) {
         		continue;
         	}
         	waiting.add(wt);
