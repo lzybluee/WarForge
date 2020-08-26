@@ -551,4 +551,8 @@ public class MatchController extends AbstractGuiGame {
     public static HostedMatch getHostedMatch() {
         return hostedMatch;
     }
+
+    @Override
+    public void setPaperCard(CardView card) {
+    }
 }
