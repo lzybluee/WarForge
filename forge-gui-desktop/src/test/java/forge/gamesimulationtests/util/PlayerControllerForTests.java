@@ -21,7 +21,7 @@ import forge.deck.Deck;
 import forge.game.Game;
 import forge.game.GameEntity;
 import forge.game.GameObject;
-import forge.game.GameType;
+import forge.game.GameRules;
 import forge.game.ability.AbilityUtils;
 import forge.game.card.*;
 import forge.game.combat.Combat;
@@ -113,7 +113,7 @@ public class PlayerControllerForTests extends PlayerController {
     }
 
     @Override
-    public List<PaperCard> sideboard(Deck deck, GameType gameType, String message) {
+    public List<PaperCard> sideboard(Deck deck, GameRules gameRules, String message) {
         return null; // refused to side
     }
 
@@ -613,9 +613,9 @@ public class PlayerControllerForTests extends PlayerController {
     }
 
     @Override
-    public void playChosenSpellAbility(SpellAbility sa) {
+    public boolean playChosenSpellAbility(SpellAbility sa) {
         // TODO Play abilities from here
-        
+        return true;
     }
 
     @Override
