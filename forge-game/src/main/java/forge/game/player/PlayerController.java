@@ -14,7 +14,6 @@ import forge.game.GameEntity;
 import forge.game.GameObject;
 import forge.game.GameOutcome.AnteResult;
 import forge.game.GameRules;
-import forge.game.GameType;
 import forge.game.card.*;
 import forge.game.combat.Combat;
 import forge.game.cost.Cost;

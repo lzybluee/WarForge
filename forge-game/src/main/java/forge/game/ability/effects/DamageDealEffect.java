@@ -12,7 +12,6 @@ import forge.game.card.CardDamageMap;
 import forge.game.card.CardUtil;
 import forge.game.player.Player;
 import forge.game.spellability.SpellAbility;
-import forge.util.Lang;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,7 +19,6 @@ import forge.game.Game;
 import forge.game.GameEntity;
 import forge.game.GameObject;
 import forge.game.GameRules;
-import forge.game.GameType;
 import forge.game.ability.AbilityUtils;
 import forge.game.ability.ApiType;
 import forge.game.card.*;

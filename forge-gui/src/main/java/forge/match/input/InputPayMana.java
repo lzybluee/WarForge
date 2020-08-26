@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import forge.GuiBase;
 import forge.game.GameActionUtil;
 import forge.game.spellability.SpellAbilityView;
 import forge.model.FModel;

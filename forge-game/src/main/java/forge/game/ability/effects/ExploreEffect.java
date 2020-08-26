@@ -1,6 +1,5 @@
 package forge.game.ability.effects;
 
-import com.google.common.collect.Lists;
 import forge.game.Game;
 import forge.game.GameEntityCounterTable;
 import forge.game.ability.AbilityKey;

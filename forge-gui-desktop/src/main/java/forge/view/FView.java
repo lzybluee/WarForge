@@ -17,7 +17,6 @@ import forge.sound.MusicPlaylist;
 import forge.sound.SoundSystem;
 import forge.toolbox.*;
 import forge.toolbox.FSkin.SkinnedLayeredPane;
-import forge.util.BuildInfo;
 import forge.util.RuntimeVersion;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.StringUtils;

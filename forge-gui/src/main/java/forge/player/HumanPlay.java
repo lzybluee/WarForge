@@ -19,7 +19,6 @@ import forge.game.player.Player;
 import forge.game.player.PlayerController;
 import forge.game.player.PlayerView;
 import forge.game.spellability.*;
-import forge.game.trigger.TriggerType;
 import forge.game.zone.ZoneType;
 import forge.match.input.InputPayMana;
 import forge.match.input.InputPayManaOfCostPayment;

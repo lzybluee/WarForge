@@ -28,7 +28,6 @@ import forge.gui.framework.DragTab;
 import forge.gui.framework.EDocID;
 import forge.gui.framework.IVDoc;
 import forge.screens.match.CMatchUI;
-import forge.screens.match.controllers.CDock.ArcState;
 import forge.screens.match.controllers.CStack;
 import forge.toolbox.FMouseAdapter;
 import forge.toolbox.FScrollPanel;
