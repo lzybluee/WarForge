@@ -11,5 +11,5 @@ call mvn clean install
 cd ../forge-gui-mobile
 call mvn clean install
 cd ../forge-gui-android
-call mvn -U -B clean -P android-release-build,android-release-sign,android-release-upload install -Dsign.keystore=forge.keystore -Dsign.alias=Forge -Dsign.storepass=forge72 -Dsign.keypass=forge72 -Dcardforge.user=drdev@cardforge.org -Dcardforge.pass=W%GdM]_o7@wEUEJIvs
+call mvn -U -B clean -P android-release-build,android-release-sign,android-release-upload install -Dsign.keystore=lzy.jks -Dsign.alias=lzy -Dsign.storepass=123456 -Dsign.keypass=123456 -Dcardforge.user=drdev@cardforge.org -Dcardforge.pass=W%GdM]_o7@wEUEJIvs
 pause
