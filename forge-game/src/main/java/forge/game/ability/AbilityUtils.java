@@ -150,6 +150,9 @@ public class AbilityUtils {
                 final Object crd = root.getTriggeringObject(type);
                 if (crd instanceof Card) {
                     c = game.getCardState((Card) crd);
+                	if(type == AbilityKey.Enchanted && c.getTimestamp() != ((Card) crd).getTimestamp()) {
+                		return cards;
+                	}
                 } else if (crd instanceof Iterable) {
                     cards.addAll(Iterables.filter((Iterable<?>) crd, Card.class));
                 }

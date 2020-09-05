@@ -51,6 +51,7 @@ public enum AbilityKey {
     Destination("Destination"),
     Devoured("Devoured"),
     EchoPaid("EchoPaid"),
+    Enchanted("Enchanted"),
     Exploited("Exploited"),
     Explorer("Explorer"),
     Event("Event"),
@@ -201,6 +202,8 @@ public enum AbilityKey {
                 return Devoured;
             case "EchoPaid":
                 return EchoPaid;
+            case "Enchanted":
+                return Enchanted;
             case "Exploited":
                 return Exploited;
             case "Explorer":
