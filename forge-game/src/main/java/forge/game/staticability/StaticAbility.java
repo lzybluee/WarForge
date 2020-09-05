@@ -793,6 +793,7 @@ public class StaticAbility extends CardTraitBase implements IIdentifiable, Clone
         try {
             clone = (StaticAbility) clone();
             clone.id = lki ? id : nextId();
+            clone.mayPlayTurn = 0;
 
             // dont use setHostCard to not trigger the not copied parts yet
             clone.hostCard = host;
