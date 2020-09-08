@@ -6,6 +6,7 @@ import forge.game.ability.AbilityUtils;
 import forge.game.ability.SpellAbilityEffect;
 import forge.game.card.*;
 import forge.game.card.CardPredicates.Presets;
+import forge.game.keyword.Keyword;
 import forge.game.player.Player;
 import forge.game.player.PlayerActionConfirmMode;
 import forge.game.player.PlayerPredicates;
@@ -147,7 +148,7 @@ public class DiscardEffect extends SpellAbilityEffect {
                         }
 
                         for (final Card c : toDiscard) {
-                            if (p.discard(c, sa, table) != null) {
+                            if (p.discard(c, sa, table) != null || c.hasKeyword(Keyword.MADNESS)) {
                                 discarded.add(c);
                             }
                         }
@@ -190,7 +191,7 @@ public class DiscardEffect extends SpellAbilityEffect {
                     }
 
                     for (final Card c : dPHand) {
-                        if (p.discard(c, sa, table) != null) {
+                        if (p.discard(c, sa, table) != null || c.hasKeyword(Keyword.MADNESS)) {
                             discarded.add(c);
                         }
                     }
@@ -229,7 +230,7 @@ public class DiscardEffect extends SpellAbilityEffect {
                         }
 
                         for (Card c : toDiscardView) {
-                            if (p.discard(c, sa, table) != null) {
+                            if (p.discard(c, sa, table) != null || c.hasKeyword(Keyword.MADNESS)) {
                                 discarded.add(c);
                             }
                         }
@@ -249,8 +250,9 @@ public class DiscardEffect extends SpellAbilityEffect {
                         }
 
                         for (Card c : toDiscard) {
-                            c.getController().discard(c, sa, table);
-                            discarded.add(c);
+                            if (c.getController().discard(c, sa, table) != null || c.hasKeyword(Keyword.MADNESS)) {
+                                discarded.add(c);
+                            }
                         }
                     }
                 }
@@ -281,7 +283,7 @@ public class DiscardEffect extends SpellAbilityEffect {
 
                     // Reveal cards that will be discarded?
                     for (final Card c : dPChHand) {
-                        if (p.discard(c, sa, table) != null) {
+                        if (p.discard(c, sa, table) != null || c.hasKeyword(Keyword.MADNESS)) {
                             discarded.add(c);
                         }
                     }
@@ -332,7 +334,7 @@ public class DiscardEffect extends SpellAbilityEffect {
                         }
                         for (Card card : toBeDiscarded) {
                             if (card == null) { continue; }
-                            if (p.discard(card, sa, table) != null) {
+                            if (p.discard(card, sa, table) != null || card.hasKeyword(Keyword.MADNESS)) {
                                 discarded.add(card);
                             }
                         }
