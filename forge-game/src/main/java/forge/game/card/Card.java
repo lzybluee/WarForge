@@ -544,6 +544,9 @@ public class Card extends GameEntity implements Comparable<Card> {
     public void updateStateForView() {
         view.updateState(this);
     }
+    public void updateStateForView(boolean forceUpdate) {
+        view.updateState(this, forceUpdate);
+    }
 
     // The following methods are used to selectively update certain view components (text,
     // P/T, card types) in order to avoid card flickering due to aggressive full update

@@ -683,6 +683,9 @@ public class CardView extends GameEntityView {
         return alternate0 ? getAlternateState() : getCurrentState();
     }
     void updateState(Card c) {
+    	updateState(c, false);
+    }
+    void updateState(Card c, boolean forceUpdate) {
         updateName(c);
 
         boolean isSplitCard = c.isSplitCard();
@@ -704,7 +707,7 @@ public class CardView extends GameEntityView {
         }
 
         CardStateView currentStateView = currentState.getView();
-        if (getCurrentState() != currentStateView) {
+        if (getCurrentState() != currentStateView || forceUpdate) {
             set(TrackableProperty.CurrentState, currentStateView);
             currentStateView.updateName(currentState);
             currentStateView.updatePower(c); //ensure power, toughness, and loyalty updated when current state changes

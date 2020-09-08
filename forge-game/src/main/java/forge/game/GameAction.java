@@ -204,10 +204,12 @@ public class GameAction {
 
                 copied = CardFactory.copyCard(c, false);
 
+                boolean forceUpdate = false;
                 if (fromBattlefield && copied.getCurrentStateName() != CardStateName.Original) {
                     // when a card leaves the battlefield, ensure it's in its original state
                     // (we need to do this on the object before copying it, or it won't work correctly e.g.
                     // on Transformed objects)
+                	forceUpdate = true;
                     copied.setState(CardStateName.Original, false);
                 }
 
@@ -228,7 +230,7 @@ public class GameAction {
                 }
 
                 // ensure that any leftover keyword/type changes are cleared in the state view
-                copied.updateStateForView();
+                copied.updateStateForView(forceUpdate);
             } else { //Token
                 copied = c;
             }
