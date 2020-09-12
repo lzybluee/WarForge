@@ -101,7 +101,7 @@ public class CopySpellAbilityEffect extends SpellAbilityEffect {
                 String prompt = "Select " + Lang.getOrdinal(multi + 1) + " spell to copy to stack";
                 SpellAbility chosen = controller.getController().chooseSingleSpellForEffect(tgtSpells, sa, prompt,
                         ImmutableMap.of());
-                SpellAbility copiedSpell = CardFactory.copySpellAbilityAndPossiblyHost(card, chosen.getHostCard(), chosen, true);
+                SpellAbility copiedSpell = CardFactory.copySpellAbilityAndPossiblyHost(card, chosen.getHostCard(), chosen, true, sa);
                 copiedSpell.getHostCard().setController(card.getController(), card.getGame().getNextTimestamp());
                 copiedSpell.setActivatingPlayer(controller);
                 copies.add(copiedSpell);
@@ -147,7 +147,7 @@ public class CopySpellAbilityEffect extends SpellAbilityEffect {
                 
                 mayChooseNewTargets = false;
                 for (GameEntity o : candidates) {
-                    SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true);
+                    SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true, sa);
                     resetFirstTargetOnCopy(copy, o, targetedSA);
                     copies.add(copy);
                 }
@@ -174,18 +174,18 @@ public class CopySpellAbilityEffect extends SpellAbilityEffect {
                 mayChooseNewTargets = false;
                 if (sa.hasParam("ChooseOnlyOne")) {
                     Card choice = controller.getController().chooseSingleEntityForEffect(valid, sa, "Choose one");
-                    SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true);
+                    SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true, sa);
                     resetFirstTargetOnCopy(copy, choice, targetedSA);
                     copies.add(copy);
                 } else {
                    for (final Card c : valid) {
-                        SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true);
+                        SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true, sa);
                         resetFirstTargetOnCopy(copy, c, targetedSA);
                         copies.add(copy);
                    }
                 }
                 for (final Player p : players) {
-                    SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true);
+                    SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(card, chosenSA.getHostCard(), chosenSA, true, sa);
                     resetFirstTargetOnCopy(copy, p, targetedSA);
                     copies.add(copy);
                 }
@@ -197,7 +197,7 @@ public class CopySpellAbilityEffect extends SpellAbilityEffect {
             chosenSA.setActivatingPlayer(controller);
             for (int i = 0; i < amount; i++) {
                 SpellAbility copy = CardFactory.copySpellAbilityAndPossiblyHost(
-                        card, chosenSA.getHostCard(), chosenSA, true);
+                        card, chosenSA.getHostCard(), chosenSA, true, sa);
 
                 // extra case for Epic to remove the keyword and the last part of the SpellAbility
                 if (sa.hasParam("Epic")) {
