@@ -207,6 +207,12 @@ public class PermanentCreatureAi extends PermanentAi {
         final Card card = sa.getHostCard();
         final ManaCost mana = card.getManaCost();
         final Game game = ai.getGame();
+        
+        for (Card c : game.getCardsIn(ZoneType.Command)) {
+            if(c.getName().contains("Gather Specimens Effect") && c.getController().isOpponentOf(ai)) {
+                return false;
+            }
+        }
 
         /*
          * Checks if the creature will have non-positive toughness after
