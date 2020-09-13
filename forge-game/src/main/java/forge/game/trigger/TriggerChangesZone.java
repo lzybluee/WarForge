@@ -99,7 +99,8 @@ public class TriggerChangesZone extends Trigger {
         }
 
         if (hasParam("ValidCard")) {
-            Card moved = (Card) runParams2.get("Card");
+            Card paramCard = (Card) runParams2.get("Card");
+            Card moved = paramCard;
             final Game game = getHostCard().getGame();
             boolean leavesBattlefield = "Battlefield".equals(getParam("Origin"));
             boolean isDiesTrig = leavesBattlefield && "Graveyard".equals(getParam("Destination"));
@@ -115,7 +116,7 @@ public class TriggerChangesZone extends Trigger {
 
             // if it is a die trigger, and the hostcard is the moved one, but it doesn't has the trigger
             // only for non-static
-            if (!isStatic() && leavesBattlefield && moved.equals(getHostCard()) && !moved.hasTrigger(this)) {
+            if (!isStatic() && leavesBattlefield && moved.equals(getHostCard()) && !paramCard.hasTrigger(this)) {
                 return false;
             }
         }
