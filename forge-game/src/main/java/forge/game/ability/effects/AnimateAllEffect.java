@@ -250,6 +250,8 @@ public class AnimateAllEffect extends AnimateEffectBase {
                             addedAbilities, addedTriggers, addedReplacements,
                             ImmutableList.of(), timestamp);
 
+                    c.removeChangedName(timestamp);
+
                     for (final SpellAbility sa : removedAbilities) {
                         sa.setTemporarilySuppressed(false);
                     }
@@ -267,6 +269,9 @@ public class AnimateAllEffect extends AnimateEffectBase {
                     for (final ReplacementEffect re : removedReplacements) {
                         re.setTemporarilySuppressed(false);
                     }
+
+                    c.updateStateForView();
+                    c.updateAbilityTextForView();
                     game.fireEvent(new GameEventCardStatsChanged(c));
                 }
             };
