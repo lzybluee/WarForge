@@ -40,6 +40,7 @@ public final class InputSelectTargets extends InputSyncronizedBase {
     private final boolean upTo;
     private final int targetNum;
     private static final long serialVersionUID = -1091595663541356356L;
+    private List<Integer> toDevideCopied = new ArrayList<>();
 
     public final boolean hasCancelled() { return bCancel; }
     public final boolean hasPressedOk() { return bOk; }
@@ -53,6 +54,9 @@ public final class InputSelectTargets extends InputSyncronizedBase {
         this.mandatory = mandatory;
         this.upTo = upTo;
         this.targetNum = targets;
+		if(tgt != null && tgt.isCopyDividedAsYouChoose()) {
+			toDevideCopied.addAll(tgt.getDividedMap().values());
+		}
 		controller.getGui().setSelectables(CardView.getCollection(choices));
 		final PlayerZoneUpdates zonesToUpdate = new PlayerZoneUpdates();
 		for (final Card c : choices) {
@@ -158,6 +162,9 @@ public final class InputSelectTargets extends InputSyncronizedBase {
             int toAdd = tgt.removeDividedAllocation(card);
             int toDevide = tgt.getStillToDivide();
             tgt.setStillToDivide(toDevide + toAdd);
+            if(tgt.isCopyDividedAsYouChoose()) {
+            	toDevideCopied.add(Integer.valueOf(toAdd));
+            }
             removeTarget(card);
             return false;
         }
@@ -262,8 +269,14 @@ public final class InputSelectTargets extends InputSyncronizedBase {
             if ((sa.getTargets().getNumTargeted() + 1 < tgt.getMaxTargets(sa.getHostCard(), sa))
                     && (tgt.getNumCandidates(sa, true) - 1 > 0) && stillToDivide > 1) {
                 final ImmutableList.Builder<Integer> choices = ImmutableList.builder();
-                for (int i = 1; i <= stillToDivide; i++) {
-                    choices.add(Integer.valueOf(i));
+                if(tgt.isCopyDividedAsYouChoose()) {
+                	for (int i : toDevideCopied) {
+                        choices.add(Integer.valueOf(i));
+                    }
+                } else {
+                    for (int i = 1; i <= stillToDivide; i++) {
+                        choices.add(Integer.valueOf(i));
+                    }
                 }
                 String apiBasedMessage = "Distribute how much to ";
                 if (sa.getApi() == ApiType.DealDamage) {
@@ -282,12 +295,42 @@ public final class InputSelectTargets extends InputSyncronizedBase {
                 if (chosen == null) {
                     return true; //still return true since there was a valid choice
                 }
+                if(tgt.isCopyDividedAsYouChoose()) {
+                	toDevideCopied.remove(chosen);
+                }
                 allocatedPortion = chosen;
+                tgt.setStillToDivide(stillToDivide - allocatedPortion);
             }
             else { // otherwise assign the rest of the damage/protection
-                allocatedPortion = stillToDivide;
+            	if(tgt.isCopyDividedAsYouChoose() && toDevideCopied.size() > 1) {
+            		final ImmutableList.Builder<Integer> choices = ImmutableList.builder();
+                	for (int i : toDevideCopied) {
+                        choices.add(Integer.valueOf(i));
+                    }
+                    String apiBasedMessage = "Distribute how much to ";
+                    if (sa.getApi() == ApiType.DealDamage) {
+                        apiBasedMessage = "Select how much damage to deal to ";
+                    }
+                    else if (sa.getApi() == ApiType.PreventDamage) {
+                        apiBasedMessage = "Select how much damage to prevent to ";
+                    }
+                    else if (sa.getApi() == ApiType.PutCounter) {
+                        apiBasedMessage = "Select how many counters to distribute to ";
+                    }
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append(apiBasedMessage);
+                    sb.append(card.toString());
+                    final Integer chosen = getController().getGui().oneOrNone(sb.toString(), choices.build());
+                    if (chosen == null) {
+                        return true; //still return true since there was a valid choice
+                    }
+                    toDevideCopied.remove(chosen);
+                    allocatedPortion = chosen;
+            	} else {
+                    allocatedPortion = stillToDivide;
+            	}
+                tgt.setStillToDivide(0);
             }
-            tgt.setStillToDivide(stillToDivide - allocatedPortion);
             tgt.addDividedAllocation(card, allocatedPortion);
         }
         addTarget(card);
@@ -311,6 +354,9 @@ public final class InputSelectTargets extends InputSyncronizedBase {
             int toAdd = tgt.removeDividedAllocation(player);
             int toDevide = tgt.getStillToDivide();
             tgt.setStillToDivide(toDevide + toAdd);
+            if(tgt.isCopyDividedAsYouChoose()) {
+            	toDevideCopied.add(Integer.valueOf(toAdd));
+            }
             removeTarget(player);
             return;
         }
@@ -337,8 +383,14 @@ public final class InputSelectTargets extends InputSyncronizedBase {
             // allow allocation only if the max targets isn't reached and there are more candidates
             if ((sa.getTargets().getNumTargeted() + 1 < tgt.getMaxTargets(sa.getHostCard(), sa)) && (tgt.getNumCandidates(sa, true) - 1 > 0) && stillToDivide > 1) {
                 final ImmutableList.Builder<Integer> choices = ImmutableList.builder();
-                for (int i = 1; i <= stillToDivide; i++) {
-                    choices.add(Integer.valueOf(i));
+                if(tgt.isCopyDividedAsYouChoose()) {
+                	for (int i : toDevideCopied) {
+                        choices.add(Integer.valueOf(i));
+                    }
+                } else {
+	                for (int i = 1; i <= stillToDivide; i++) {
+	                    choices.add(Integer.valueOf(i));
+	                }
                 }
                 String apiBasedMessage = "Distribute how much to ";
                 if (sa.getApi() == ApiType.DealDamage) {
@@ -353,11 +405,37 @@ public final class InputSelectTargets extends InputSyncronizedBase {
                 if (null == chosen) {
                     return;
                 }
+                if(tgt.isCopyDividedAsYouChoose()) {
+                	toDevideCopied.remove(chosen);
+                }
                 allocatedPortion = chosen;
+                tgt.setStillToDivide(stillToDivide - allocatedPortion);
             } else { // otherwise assign the rest of the damage/protection
-                allocatedPortion = stillToDivide;
+            	if(tgt.isCopyDividedAsYouChoose() && toDevideCopied.size() > 1) {
+                    final ImmutableList.Builder<Integer> choices = ImmutableList.builder();
+                	for (int i : toDevideCopied) {
+                        choices.add(Integer.valueOf(i));
+                    }
+                    String apiBasedMessage = "Distribute how much to ";
+                    if (sa.getApi() == ApiType.DealDamage) {
+                        apiBasedMessage = "Select how much damage to deal to ";
+                    } else if (sa.getApi() == ApiType.PreventDamage) {
+                        apiBasedMessage = "Select how much damage to prevent to ";
+                    }
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append(apiBasedMessage);
+                    sb.append(player.getName());
+                    final Integer chosen = getController().getGui().oneOrNone(sb.toString(), choices.build());
+                    if (null == chosen) {
+                        return;
+                    }
+                    toDevideCopied.remove(chosen);
+                    allocatedPortion = chosen;
+            	} else {
+                    allocatedPortion = stillToDivide;
+            	}
+                tgt.setStillToDivide(0);
             }
-            tgt.setStillToDivide(stillToDivide - allocatedPortion);
             tgt.addDividedAllocation(player, allocatedPortion);
         }
         addTarget(player);

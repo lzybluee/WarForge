@@ -25,6 +25,7 @@ import forge.util.TextUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import forge.card.CardType;
 import forge.game.Game;
@@ -77,6 +78,7 @@ public class TargetRestrictions {
 
     // For "Divided" cards. Is this better in TargetChoices?
     private boolean dividedAsYouChoose = false;
+    private boolean copyDividedAsYouChoose = false;
     private HashMap<Object, Integer> dividedMap = new HashMap<>();
     private int stillToDivide = 0;
     
@@ -112,6 +114,13 @@ public class TargetRestrictions {
         this.randomTarget = target.isRandomTarget();
     }
 
+    public TargetRestrictions(final TargetRestrictions target, boolean copy) {
+    	this(target);
+    	if(dividedAsYouChoose && copy) {
+    		this.copyDividedAsYouChoose = true;
+    		this.dividedMap = Maps.newHashMap(target.getDividedMap());
+    	}
+    }
     /**
      * <p>
      * Constructor for Target.
@@ -726,6 +735,13 @@ public class TargetRestrictions {
      */
     public boolean isDividedAsYouChoose() {
         return this.dividedAsYouChoose;
+    }
+
+    /**
+     * @return a boolean copyDividedAsYouChoose
+     */
+    public boolean isCopyDividedAsYouChoose() {
+        return this.copyDividedAsYouChoose;
     }
 
     /**
