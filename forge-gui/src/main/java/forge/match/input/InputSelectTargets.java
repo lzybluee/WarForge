@@ -33,14 +33,13 @@ public final class InputSelectTargets extends InputSyncronizedBase {
     private final Map<GameEntity, Integer> targetDepth = new HashMap<>();
     private final TargetRestrictions tgt;
     private final SpellAbility sa;
-    private Card lastTarget = null;
     private boolean bCancel = false;
     private boolean bOk = false;
     private final boolean mandatory;
     private final boolean upTo;
     private final int targetNum;
     private static final long serialVersionUID = -1091595663541356356L;
-    private List<Integer> devideDistrubtion = new ArrayList<>();
+    private List<Integer> devideDistrubtion;
 
     public final boolean hasCancelled() { return bCancel; }
     public final boolean hasPressedOk() { return bOk; }
@@ -54,7 +53,7 @@ public final class InputSelectTargets extends InputSyncronizedBase {
         this.mandatory = mandatory;
         this.upTo = upTo;
         this.targetNum = targets;
-		if(tgt != null && (tgt.isCopyDividedAsYouChoose() || targetNum > 0)) {
+        if(tgt != null && tgt.isDividedAsYouChoose() && (tgt.isCopyDividedAsYouChoose() || targetNum > 0)) {
 			devideDistrubtion = new ArrayList<>(tgt.getDividedMap().values());
 		} else {
 			devideDistrubtion = null;
@@ -447,7 +446,6 @@ public final class InputSelectTargets extends InputSyncronizedBase {
         sa.getTargets().add(ge);
         if (ge instanceof Card) {
             getController().getGui().setUsedToPay(CardView.get((Card) ge), true);
-            lastTarget = (Card) ge;
         } else if(ge instanceof Player) {
             getController().getGui().setHighlighted(PlayerView.get((Player) ge), true);
         }
@@ -481,7 +479,17 @@ public final class InputSelectTargets extends InputSyncronizedBase {
                 getController().getGui().setHighlighted(PlayerView.get((Player) ge), false);
             }
         }
-
+    	if(tgt != null && tgt.isDividedAsYouChoose()) {
+    		List<Object> toRemove = new ArrayList<>();
+    		for(Object obj : tgt.getDividedMap().keySet()) {
+    			if(!sa.getTargets().getTargets().contains(obj)) {
+    				toRemove.add(obj);
+    			}
+    		}
+    		for(Object obj : toRemove) {
+    			tgt.removeDividedAllocation(obj);
+    		}
+    	}
         this.stop();
     }
 
