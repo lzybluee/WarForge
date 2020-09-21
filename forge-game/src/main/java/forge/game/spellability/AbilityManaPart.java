@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import forge.card.CardStateName;
 import forge.card.ColorSet;
 import forge.card.MagicColor;
 import forge.game.ability.AbilityFactory;
@@ -291,6 +292,19 @@ public class AbilityManaPart implements java.io.Serializable {
         return this.manaRestrictions;
     }
 
+    public boolean meetsManaRestrictions(final SpellAbility sa) {
+    	Card hostCard = sa.getHostCard();
+    	if(hostCard != null && sa.isSpell() && sa.isCastFaceDown()) {
+    		CardStateName stateBackup = hostCard.getCurrentStateName();
+            boolean face = hostCard.isFaceDown();
+            hostCard.turnFaceDownNoUpdate();
+            boolean success = checkMeetsManaRestrictions(sa);
+            hostCard.setState(stateBackup, false);
+            hostCard.setFaceDown(face);
+            return success;
+    	}
+    	return checkMeetsManaRestrictions(sa);
+    }
     /**
      * <p>
      * meetsManaRestrictions.
@@ -300,7 +314,7 @@ public class AbilityManaPart implements java.io.Serializable {
      *            a {@link forge.game.spellability.SpellAbility} object.
      * @return a boolean.
      */
-    public boolean meetsManaRestrictions(final SpellAbility sa) {
+    public boolean checkMeetsManaRestrictions(final SpellAbility sa) {
         // No restrictions
         if (this.manaRestrictions.isEmpty()) {
             return true;
@@ -327,17 +341,11 @@ public class AbilityManaPart implements java.io.Serializable {
                 continue;
             }
             if (restriction.equals("MorphOrManifest")) {
-                if ((sa.isSpell() && sa.getHostCard().isCreature() && sa.isCastFaceDown())
+                if ((sa.isSpell() && sa.isCastFaceDown())
                         || sa.isManifestUp() || sa.isMorphUp()) {
                     return true;
                 } else {
                     continue;
-                }
-            }
-
-            if(restriction.equals("Card.Colorless")) {
-                if (sa.isSpell() && sa.getHostCard().isCreature() && sa.isCastFaceDown()) {
-                    return true;
                 }
             }
 
