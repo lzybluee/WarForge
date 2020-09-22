@@ -259,6 +259,9 @@ public class ControlGainAi extends SpellAbilityAi {
 
     @Override
     protected boolean doTriggerAINoCost(Player ai, SpellAbility sa, boolean mandatory) {
+        if ("Never".equals(sa.getParam("AILogic"))) {
+            return false;
+        }
         if (sa.getTargetRestrictions() == null) {
             if (mandatory) {
                 return true;
