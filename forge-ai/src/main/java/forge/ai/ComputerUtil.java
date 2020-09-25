@@ -1750,7 +1750,11 @@ public class ComputerUtil {
                     if (saviourApi == ApiType.ChangeZone && (c.getOwner().isOpponentOf(aiPlayer) || c.isToken())) {
                         continue;
                     }
-                    
+
+                    if (saviourApi == ApiType.ChangeZone && threatApi == ApiType.DamageAll && saviour.hasParam("IsCloudshift") && !useParentTargets) {
+                        continue;
+                    }
+
                     if (predictDamage >= ComputerUtilCombat.getDamageToKill(c) || hasDeathtouch) {
                         threatened.add(c);
                     }
@@ -1810,6 +1814,10 @@ public class ComputerUtil {
                     if (saviourApi == ApiType.ChangeZone && (c.getOwner().isOpponentOf(aiPlayer) || c.isToken())) {
                         continue;
                     }
+
+                    if (saviourApi == ApiType.ChangeZone && threatApi == ApiType.PumpAll && saviour.hasParam("IsCloudshift") && !useParentTargets) {
+                        continue;
+                    }
                     threatened.add(c);
                 }
             }
@@ -1855,6 +1863,10 @@ public class ComputerUtil {
                         continue;
                     }
 
+                    if (saviourApi == ApiType.ChangeZone && threatApi == ApiType.DestroyAll && saviour.hasParam("IsCloudshift") && !useParentTargets) {
+                        continue;
+                    }
+
                     // don't use it on creatures that can't be regenerated
                     if (saviourApi == ApiType.Regenerate && !c.canBeShielded()) {
                         continue;
@@ -1889,6 +1901,10 @@ public class ComputerUtil {
                     // don't bounce or blink a permanent that the human
                     // player owns or is a token
                     if (saviourApi == ApiType.ChangeZone && (c.getOwner().isOpponentOf(aiPlayer) || c.isToken())) {
+                        continue;
+                    }
+
+                    if (saviourApi == ApiType.ChangeZone && threatApi == ApiType.ChangeZoneAll && saviour.hasParam("IsCloudshift") && !useParentTargets) {
                         continue;
                     }
 
