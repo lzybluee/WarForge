@@ -283,6 +283,7 @@ public class CardDetailUtil {
                 area.append("\n");
             }
             area.append("Planeswalker ability activated this turn : " + card.getPlaneswalkerAbilityActivited());
+            area.append(".\n");
         }
         
         // card text
