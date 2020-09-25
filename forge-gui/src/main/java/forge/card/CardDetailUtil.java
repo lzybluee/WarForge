@@ -278,11 +278,11 @@ public class CardDetailUtil {
             area.append("\n");
         }
 
-        if(state.isPlaneswalker()) {
+        if(state.isPlaneswalker() && card.getZone() == ZoneType.Battlefield) {
         	if (area.length() != 0) {
                 area.append("\n");
             }
-            area.append("Planeswalker ability activated this turn : " + card.getPlaneswalkerAbilityActivited());
+            area.append("> Planeswalker ability activated this turn : " + card.getPlaneswalkerAbilityActivited());
             area.append(".\n");
         }
         
