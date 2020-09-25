@@ -1363,7 +1363,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
 
     @Override
     public boolean playChosenSpellAbility(final SpellAbility chosenSa) {
-        HumanPlay.playSpellAbility(this, player, chosenSa);
+        HumanPlay.playSpellAbility(this, player, chosenSa, true);
         return true;
     }
 
@@ -1657,6 +1657,9 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
 
     @Override
     public boolean confirmPayment(final CostPart costPart, final String question, SpellAbility sa) {
+    	if(costPart.mustPay()) {
+    		return true;
+    	}
         final InputConfirm inp = new InputConfirm(this, question, sa);
         inp.showAndWait();
         return inp.getResult();
@@ -1842,7 +1845,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         for (int i = orderedSAs.size() - 1; i >= 0; i--) {
             final SpellAbility next = orderedSAs.get(i);
             if (next.isTrigger()) {
-                HumanPlay.playSpellAbility(this, player, next);
+                HumanPlay.playSpellAbility(this, player, next, true);
             } else {
                 player.getGame().getStack().add(next);
             }
@@ -1856,7 +1859,7 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
 
     @Override
     public boolean playSaFromPlayEffect(final SpellAbility tgtSA) {
-        return HumanPlay.playSpellAbility(this, player, tgtSA);
+        return HumanPlay.playSpellAbility(this, player, tgtSA, true);
     }
 
     @Override

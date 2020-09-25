@@ -344,6 +344,12 @@ public class ManaPool extends ManaConversionMatrix implements Iterable<Mana> {
             refundManaPaid(am);
         }
 
+        for (final SpellAbility am : payingAbilities) {
+            if(am.getManaPart() != null && am.getManaPart().getLastManaProduced() != null) {
+                am.getManaPart().getLastManaProduced().clear();
+            }
+        }
+
         payingAbilities.clear();
 
         // update battlefield of activating player - to redraw cards used to pay mana as untapped

@@ -132,10 +132,20 @@ public class CostPayment extends ManaConversionMatrix {
         final List<CostPart> costParts = adjustedCost.getCostPartsWithZeroMana();
 
         final Game game = decisionMaker.getPlayer().getGame();
+        CostPart lastPart = null;
 
+        int index = 0;
+        boolean mustPay = false;
         for (final CostPart part : costParts) {
             // Wrap the cost and push onto the cost stack
             game.costPaymentStack.push(part, this);
+            
+            if((lastPart != null && !lastPart.isUndoable()) || mustPay) {
+                part.setMustPay(true);
+                mustPay = true;
+            } else {
+            	part.setMustPay(false);
+            }
 
             PaymentDecision pd = part.accept(decisionMaker);
 
@@ -145,12 +155,19 @@ public class CostPayment extends ManaConversionMatrix {
             }
 
             if (pd == null || !part.payAsDecided(decisionMaker.getPlayer(), pd, ability)) {
+            	part.setMustPay(false);
                 game.costPaymentStack.pop(); // cost is resolved
                 return false;
             }
+            part.setMustPay(false);
             this.paidCostParts.add(part);
+            if(index < cost.getCostParts().size()) {
+                cost.getCostParts().get(index).setPaidAmount(part.getPaidAmount());
+            }
 
             game.costPaymentStack.pop(); // cost is resolved
+            lastPart = part;
+            index++;
         }
 
         // this clears lists used for undo. 
