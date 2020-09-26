@@ -274,6 +274,7 @@ public class GameAction {
             if(noLandLKI.isLand()) {
                 // if it isn't on the Stack, it stays in that Zone
                 if (!c.getZone().is(ZoneType.Stack)) {
+                	game.addCard(c.getId(), c);
                     return c;
                 }
                 // if something would only be a land when entering the battlefield and not before
@@ -329,9 +330,12 @@ public class GameAction {
 	
 	                if (game.getStack().isResolving(c) && !zoneTo.is(ZoneType.Graveyard) && repres == ReplacementResult.Prevented) {
 	                    copied.getOwner().removeInboundToken(copied);
-	                    return moveToGraveyard(c, cause, params);
+	                    Card mc = moveToGraveyard(c, cause, params);
+	                    game.addCard(mc.getId(), mc);
+	                    return mc;
 	                }
 	                copied.getOwner().removeInboundToken(copied);
+	                game.addCard(c.getId(), c);
 	                return c;
 	            }
             }
