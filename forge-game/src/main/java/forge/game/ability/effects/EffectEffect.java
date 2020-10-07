@@ -33,7 +33,8 @@ public class EffectEffect extends SpellAbilityEffect {
      *            a {@link forge.game.spellability.SpellAbility} object.
      */
 
-    @Override
+    @SuppressWarnings("serial")
+	@Override
     public void resolve(SpellAbility sa) {
         final Card hostCard = sa.getHostCard();
         final Game game = hostCard.getGame();
@@ -293,9 +294,26 @@ public class EffectEffect extends SpellAbilityEffect {
             eff.updateStateForView();
 
             // TODO: Add targeting to the effect so it knows who it's dealing with
-            game.getTriggerHandler().suppressMode(TriggerType.ChangesZone);
-            game.getAction().moveTo(ZoneType.Command, eff, sa);
-            game.getTriggerHandler().clearSuppression(TriggerType.ChangesZone);
+            final boolean nextTurn = sa.hasParam("NextTurn");
+            if(nextTurn) {
+            	final Player targetPlayer = sa.getTargets().getFirstTargetedPlayer();
+            	if(targetPlayer != null) {
+                	game.getUntap().addUntil(targetPlayer, new GameCommand() {
+                        @Override
+                        public void run() {
+                        	if(game.getPlayers().contains(targetPlayer)) {
+                            	game.getTriggerHandler().suppressMode(TriggerType.ChangesZone);
+                                game.getAction().moveTo(ZoneType.Command, eff, sa);
+                                game.getTriggerHandler().clearSuppression(TriggerType.ChangesZone);
+                        	}
+                        }
+                    });		
+            	}
+            } else {
+                game.getTriggerHandler().suppressMode(TriggerType.ChangesZone);
+                game.getAction().moveTo(ZoneType.Command, eff, sa);
+                game.getTriggerHandler().clearSuppression(TriggerType.ChangesZone);
+            }
             //if (effectTriggers != null) {
             //    game.getTriggerHandler().registerActiveTrigger(cmdEffect, false);
             //}
