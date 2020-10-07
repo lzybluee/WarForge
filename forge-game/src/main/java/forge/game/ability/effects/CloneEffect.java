@@ -7,7 +7,10 @@ import forge.game.ability.SpellAbilityEffect;
 import forge.game.card.*;
 import forge.game.event.GameEventCardStatsChanged;
 import forge.game.player.Player;
+import forge.game.replacement.ReplacementEffect;
 import forge.game.spellability.SpellAbility;
+import forge.game.staticability.StaticAbility;
+import forge.game.trigger.Trigger;
 import forge.game.zone.ZoneType;
 
 import java.util.Arrays;
@@ -117,6 +120,19 @@ public class CloneEffect extends SpellAbilityEffect {
 
         final Long ts = game.getNextTimestamp();
         tgtCard.addCloneState(CardFactory.getCloneStates(cardToCopy, tgtCard, sa), ts);
+
+        for (final SpellAbility sp : tgtCard.getAllSpellAbilities()) {
+            sp.setTemporarilySuppressed(false);
+        }
+        for (final Trigger tr : tgtCard.getTriggers()) {
+            tr.setSuppressed(false);
+        }
+        for (final StaticAbility st : tgtCard.getStaticAbilities()) {
+            st.setTemporarilySuppressed(false);
+        }
+        for (final ReplacementEffect re : tgtCard.getReplacementEffects()) {
+            re.setSuppressed(false);
+        }
 
         // set ETB tapped of clone
         if (sa.hasParam("IntoPlayTapped")) {

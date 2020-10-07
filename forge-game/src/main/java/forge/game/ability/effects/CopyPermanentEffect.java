@@ -20,7 +20,10 @@ import forge.game.card.token.TokenInfo;
 import forge.game.combat.Combat;
 import forge.game.event.GameEventCombatChanged;
 import forge.game.player.Player;
+import forge.game.replacement.ReplacementEffect;
 import forge.game.spellability.SpellAbility;
+import forge.game.staticability.StaticAbility;
+import forge.game.trigger.Trigger;
 import forge.game.zone.ZoneType;
 import forge.item.PaperCard;
 import forge.util.Aggregates;
@@ -177,6 +180,19 @@ public class CopyPermanentEffect extends SpellAbilityEffect {
                 final List<Card> crds = Lists.newArrayListWithCapacity(token.size());
 
                 for (final Card t : token) {
+                    for (final SpellAbility sp : t.getAllSpellAbilities()) {
+                        sp.setTemporarilySuppressed(false);
+                    }
+                    for (final Trigger tr : t.getTriggers()) {
+                        tr.setSuppressed(false);
+                    }
+                    for (final StaticAbility st : t.getStaticAbilities()) {
+                        st.setTemporarilySuppressed(false);
+                    }
+                    for (final ReplacementEffect re : t.getReplacementEffects()) {
+                        re.setSuppressed(false);
+                    }
+
                     t.setCopiedPermanent(proto);
 
                     // Temporarily register triggers of an object created with CopyPermanent
