@@ -699,7 +699,7 @@ public class CardPanel extends SkinnedPanel implements CardContainer, IDisposabl
         final int damage = card.getDamage();
         damageText.setText(damage > 0 ? "\u00BB " + damage + " \u00AB" : "");
 
-        // Card Id overlay\
+        // Card Id overlay
         boolean sickness = card.getCurrentState().getCard().getZone() == ZoneType.Battlefield && card.getCurrentState().getCard().isFirstTurnControlled();
         cardIdText.setText((sickness ? "(" : "") + card.getCurrentState().getDisplayId() + (sickness ? ")" : ""));
     }
