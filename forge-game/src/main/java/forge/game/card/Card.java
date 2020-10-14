@@ -6299,6 +6299,7 @@ public class Card extends GameEntity implements Comparable<Card> {
     public void addPlaneswalkerAbilityActivated() {
         planeswalkerAbilityActivated++;
         view.updatePlaneswalkerAbilityActivited(planeswalkerAbilityActivated);
+        game.fireEvent(new GameEventCardStatsChanged(this));
     }
 
     public void resetActivationsPerTurn() {
@@ -6306,6 +6307,7 @@ public class Card extends GameEntity implements Comparable<Card> {
         view.updatePlaneswalkerAbilityActivited(planeswalkerAbilityActivated);
         numberTurnActivations.clear();
         numberTurnActivationsStatic.clear();
+        game.fireEvent(new GameEventCardStatsChanged(this));
     }
 
     public void addCanBlockAdditional(int n, long timestamp) {
