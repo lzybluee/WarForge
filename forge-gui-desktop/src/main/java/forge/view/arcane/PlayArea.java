@@ -884,6 +884,28 @@ public class PlayArea extends CardPanelContainer implements CardPanelMouseListen
         private void addAllOthers(final List<CardPanel> cardPanels, final RowType type) {
         	List<CardPanel> sortedPanels = new ArrayList<>();
         	for (final CardPanel panel : cardPanels) {
+        		if(!sortedPanels.contains(panel) && panel.getCard().getCurrentState().isPlaneswalker() && !panel.getCard().isToken()) {
+        			sortedPanels.add(panel);
+        		}
+        	}
+        	for (final CardPanel panel : cardPanels) {
+        		if(!sortedPanels.contains(panel) && panel.getCard().getCurrentState().isArtifact() && !panel.getCard().getCurrentState().isEnchantment()
+        				&& !panel.getCard().isToken()) {
+        			sortedPanels.add(panel);
+        		}
+        	}
+        	for (final CardPanel panel : cardPanels) {
+        		if(!sortedPanels.contains(panel) && panel.getCard().getCurrentState().isArtifact() && panel.getCard().getCurrentState().isEnchantment()
+        				&& !panel.getCard().isToken()) {
+        			sortedPanels.add(panel);
+        		}
+        	}
+        	for (final CardPanel panel : cardPanels) {
+        		if(!sortedPanels.contains(panel) && panel.getCard().getCurrentState().isEnchantment() && !panel.getCard().isToken()) {
+        			sortedPanels.add(panel);
+        		}
+        	}
+        	for (final CardPanel panel : cardPanels) {
         		if(!sortedPanels.contains(panel) && panel.getCard().getCurrentState().isPlaneswalker()) {
         			sortedPanels.add(panel);
         		}
