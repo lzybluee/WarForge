@@ -51,3 +51,8 @@ Type=Other
 43 M Strip Mine
 44 M Tectonic Edge
 45 M Wasteland
+46 M Plains
+47 M Island
+48 M Swamp
+49 M Mountain
+50 M Forest
