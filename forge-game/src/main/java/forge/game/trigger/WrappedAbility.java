@@ -238,9 +238,12 @@ public class WrappedAbility extends Ability {
             sb.append(")");
         }
 
-        sb.append(" [");
-        sb.append(regtrig.getImportantStackObjects(this));
-        sb.append("]");
+        String objects = regtrig.getImportantStackObjects(this);
+        if(objects != null && !objects.isEmpty()) {
+            sb.append(" [");
+            sb.append(objects);
+            sb.append("]"); 	
+        }
 
         return sb.toString();
     }
