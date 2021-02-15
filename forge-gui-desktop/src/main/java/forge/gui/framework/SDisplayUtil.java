@@ -75,7 +75,7 @@ public class SDisplayUtil {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {
                         final int r = newR == null ? oldR : newR[counter];
-                        final int a = newA == null ? oldA : newR[counter];
+                        final int a = newA == null ? oldA : newA[counter];
                         pnl.setBackground(new Color(r, oldG, oldB, a));
                     }
                     });
