@@ -1797,6 +1797,16 @@ public class ComputerUtilCombat {
         return false;
     }
 
+    static boolean hasDamageDestoryAbility(Card card) {
+    	if(card.getType().hasCreatureType("Sliver")) {
+    		for(Card c : card.getGame().getCardsIn(ZoneType.Battlefield)) {
+    			if(c.getSVar("AllSliverHasDamageDestory").equals("TRUE")) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
     // can the blocker destroy the attacker?
     /**
      * <p>
@@ -1903,7 +1913,7 @@ public class ComputerUtilCombat {
         }
 
         if (blocker.hasKeyword(Keyword.DOUBLE_STRIKE)) {
-            if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || attacker.hasSVar("DestroyWhenDamaged"))) {
+            if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(blocker) || attacker.hasSVar("DestroyWhenDamaged"))) {
                 return true;
             }
             if (defenderDamage >= attackerLife) {
@@ -1917,7 +1927,7 @@ public class ComputerUtilCombat {
                 if (attackerDamage >= defenderLife) {
                     return false;
                 }
-                if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || blocker.hasSVar("DestroyWhenDamaged"))) {
+                if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(attacker) || blocker.hasSVar("DestroyWhenDamaged"))) {
                     return false;
                 }
             }
@@ -1935,12 +1945,12 @@ public class ComputerUtilCombat {
                 if (attackerDamage >= defenderLife) {
                     return false;
                 }
-                if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || blocker.hasSVar("DestroyWhenDamaged"))) {
+                if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(attacker) || blocker.hasSVar("DestroyWhenDamaged"))) {
                     return false;
                 }
             }
 
-            if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || attacker.hasSVar("DestroyWhenDamaged"))) {
+            if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(blocker) || attacker.hasSVar("DestroyWhenDamaged"))) {
                 return true;
             }
 
@@ -2154,7 +2164,7 @@ public class ComputerUtilCombat {
         }
 
         if (attacker.hasKeyword(Keyword.DOUBLE_STRIKE)) {
-            if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || blocker.hasSVar("DestroyWhenDamaged"))) {
+            if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(attacker) || blocker.hasSVar("DestroyWhenDamaged"))) {
                 return true;
             }
             if (attackerDamage >= defenderLife) {
@@ -2168,7 +2178,7 @@ public class ComputerUtilCombat {
                 if (defenderDamage >= attackerLife) {
                     return false;
                 }
-                if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || attacker.hasSVar("DestroyWhenDamaged"))) {
+                if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(blocker) || attacker.hasSVar("DestroyWhenDamaged"))) {
                     return false;
                 }
             }
@@ -2186,12 +2196,12 @@ public class ComputerUtilCombat {
                 if (defenderDamage >= attackerLife) {
                     return false;
                 }
-                if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || attacker.hasSVar("DestroyWhenDamaged"))) {
+                if (defenderDamage > 0 && (hasKeyword(blocker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(blocker) || attacker.hasSVar("DestroyWhenDamaged"))) {
                     return false;
                 }
             }
 
-            if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || blocker.hasSVar("DestroyWhenDamaged"))) {
+            if (attackerDamage > 0 && (hasKeyword(attacker, "Deathtouch", withoutAbilities, combat) || hasDamageDestoryAbility(attacker) || blocker.hasSVar("DestroyWhenDamaged"))) {
                 return true;
             }
 
