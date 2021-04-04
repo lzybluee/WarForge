@@ -870,12 +870,26 @@ public class GameAction {
                 if (affectedHere != null) {
                     for (final Card c : affectedHere) {
                         for (final StaticAbility st2 : c.getStaticAbilities()) {
-                            if (!staticAbilities.contains(st2)) {
+                            if (!staticAbilities.contains(st2) && !toAdd.contains(st2)) {
                                 toAdd.add(st2);
                             }
                         }
                     }
                 }
+            }
+            if(!toAdd.isEmpty()) {
+	            List<StaticAbility> toRemove = Lists.newArrayList();
+	            for(final StaticAbility sta : staticAbilities) {
+	            	if(sta.isTemporary() && !sta.getHostCard().getStaticAbilities().contains(sta)) {
+	            		for(final StaticAbility add : toAdd) {
+	            			if(add.getMapParams().equals(sta.getMapParams())) {
+			            		toRemove.add(sta);
+			            		break;
+	            			}
+	            		}
+	            	}
+	            }
+	            staticAbilities.removeAll(toRemove);
             }
             staticAbilities.addAll(toAdd);
         }
