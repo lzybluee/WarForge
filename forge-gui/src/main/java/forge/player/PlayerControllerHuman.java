@@ -362,11 +362,25 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
         }
         builder.append("%d ").append(message).append("(s) to ").append(action).append(".");
 
-        final InputSelectCardsFromList inp = new InputSelectCardsFromList(this, min, max, valid, sa);
-        inp.setMessage(builder.toString());
-        inp.setCancelAllowed(min == 0);
-        inp.showAndWait();
-        return new CardCollection(inp.getSelected());
+        CardCollection selected = new CardCollection();
+
+        while(true) {
+            final InputSelectCardsFromList inp = new InputSelectCardsFromList(this, min, max, valid, sa);
+            inp.setMessage(builder.toString());
+            inp.setCancelAllowed(min == 0);
+            inp.showAndWait();
+
+            if(!inp.hasCancelled() && !valid.isEmpty() && inp.getSelected().isEmpty() && min == 0 && max > 0) {
+                if(InputConfirm.confirm(this, sa, "Cancel " + action + " ?")) {
+                    break;
+                }
+            } else {
+                selected.addAll(inp.getSelected());
+                break;
+            }
+        }
+
+        return selected;
     }
 
     private boolean useSelectCardsInput(final FCollectionView<? extends GameEntity> sourceList) {
@@ -469,12 +483,22 @@ public class PlayerControllerHuman extends PlayerController implements IGameCont
             tempShow(delayedReveal.getCards());
         }
         if (useSelectCardsInput(optionList)) {
-            final InputSelectEntitiesFromList<T> input = new InputSelectEntitiesFromList<>(this, isOptional ? 0 : 1, 1,
-                    optionList, sa);
-            input.setCancelAllowed(isOptional);
-            input.setMessage(MessageUtil.formatMessage(title, player, targetedPlayer));
-            input.showAndWait();
-	    endTempShowCards();
+            InputSelectEntitiesFromList<T> input = null;
+            while(true) {
+                input = new InputSelectEntitiesFromList<>(this, isOptional ? 0 : 1, 1,
+                        optionList, sa);
+                input.setCancelAllowed(isOptional);
+                input.setMessage(MessageUtil.formatMessage(title, player, targetedPlayer));
+                input.showAndWait();
+                if(!input.hasCancelled() && isOptional && !optionList.isEmpty() && input.getSelected().isEmpty()) {
+                    if(InputConfirm.confirm(this, sa, "Cancel choose?")) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            endTempShowCards();
             return Iterables.getFirst(input.getSelected(), null);
         }
 
