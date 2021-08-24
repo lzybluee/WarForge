@@ -314,6 +314,7 @@ public class CombatUtil {
         runParams.put(AbilityKey.Attacked, combat.getDefenderByAttacker(c));
         runParams.put(AbilityKey.DefendingPlayer, combat.getDefenderPlayerByAttacker(c));
         runParams.put(AbilityKey.Defenders, combat.getDefenders());
+        runParams.put(AbilityKey.Defender, combat.getDefenderByAttacker(c));
         game.getTriggerHandler().runTrigger(TriggerType.Attacks, runParams, false);
 
         c.getDamageHistory().setCreatureAttackedThisCombat(true);
