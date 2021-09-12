@@ -435,6 +435,14 @@ public class ComputerUtilCombat {
             if (threateningCommanders.contains(attacker)) {
                 return true;
             }
+            Player player = attacker.getController();
+            for(Card c : player.getCardsIn(ZoneType.Command)) {
+                for(Trigger t : c.getTriggers()) {
+                    if(t.hasParam("MustBeBlocked")) {
+                        return true;
+                    }
+                }
+            }
         }
 
         int threshold = (((PlayerControllerAi) ai.getController()).getAi().getIntProperty(AiProps.AI_IN_DANGER_THRESHOLD));
