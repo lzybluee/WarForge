@@ -34,6 +34,7 @@ import forge.game.keyword.Keyword;
 import forge.game.keyword.KeywordInterface;
 import forge.game.player.Player;
 import forge.game.spellability.SpellAbility;
+import forge.game.staticability.StaticAbility;
 import forge.game.trigger.Trigger;
 import forge.game.trigger.TriggerType;
 import forge.game.zone.ZoneType;
@@ -469,6 +470,19 @@ public class AiAttackController {
             }
             if (this.attackers.size() >= minCreatures) {
                 return true;
+            }
+        }
+
+        // Gideon of the Trials's emblem
+        for(Card emblem : defendingOpponent.getCardsIn(ZoneType.Command)) {
+            for(StaticAbility sa : emblem.getStaticAbilities()) {
+                if(sa.hasParam("GideonShield")) {
+                    for(Card c : defendingOpponent.getCardsIn(ZoneType.Battlefield)) {
+                    	if(c.isPlaneswalker() && c.getType().hasSubtype("Gideon")) {
+                    		return false;
+                    	}
+                    }
+                }
             }
         }
 
